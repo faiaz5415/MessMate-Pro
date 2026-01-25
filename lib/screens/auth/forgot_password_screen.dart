@@ -28,7 +28,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             const SizedBox(height: 12),
 
             const Text(
-              'Enter your email and we’ll send you a reset link.',
+              'Enter your email and we’ll send you a reset Code.',
               style: TextStyle(color: Colors.grey),
             ),
 
@@ -55,7 +55,7 @@ class ForgotPasswordScreen extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text('Send Reset Link'),
+              child: const Text('Send Reset Code'),
             ),
           ],
         ),

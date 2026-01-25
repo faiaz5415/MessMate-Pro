@@ -93,7 +93,7 @@ class SignInScreen extends StatelessWidget {
                 child: const Text('Forgot Password?'),
               ),
 
-              const SizedBox(height: 300),
+              const SizedBox(height: 40),
 
               /// Sign Up section
               Row(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// import 'package:mess_mate_pro/screens/auth/sign_in_screen.dart'; // এই ইম্পোর্টটি এখন আর প্রয়োজন নেই যদি main.dart এ route ঠিক থাকে
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen({super.key});
@@ -75,11 +76,13 @@ class SignUpScreen extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                // mock sign up
-                // You would navigate to the next screen here, e.g., profile setup
-                // For now, let's assume you might want to go back to sign in or to profile setup
-                // Example: Navigator.pushReplacementNamed(context, '/profile-setup');
-                print('Sign Up button pressed (mock action)');
+                // "Create Account" button press action
+                // After successful sign up, navigate to the Sign In screen.
+                // Use pushReplacementNamed to replace the current screen.
+                Navigator.pushReplacementNamed(
+                  context,
+                  '/sign-in', // Route name for SignInScreen defined in main.dart
+                );
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
