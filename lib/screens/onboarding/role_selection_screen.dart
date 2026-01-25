@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'dining_select_screen.dart';
+
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
@@ -9,6 +11,7 @@ class RoleSelectionScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Choose Your Role'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -16,23 +19,43 @@ class RoleSelectionScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 24),
 
+            /// Mess Manager
             _RoleCard(
               icon: Icons.admin_panel_settings,
               title: 'Mess Manager',
               subtitle: 'Manages meals, bazar and costs',
               onTap: () {
-                // select manager
+                // Later: save role = manager in Provider
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const DiningSelectScreen(
+                      isManager: true,
+                    ),
+                  ),
+                );
               },
             ),
 
             const SizedBox(height: 16),
 
+            /// Mess Member
             _RoleCard(
               icon: Icons.people,
               title: 'Mess Member',
               subtitle: 'Logs meals and views costs',
               onTap: () {
-                // select member
+                // Later: save role = member in Provider
+
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const DiningSelectScreen(
+                      isManager: false,
+                    ),
+                  ),
+                );
               },
             ),
           ],
