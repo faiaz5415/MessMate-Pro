@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 
-
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // MOCK DATA (later Provider/Firebase থেকে আসবে)
-    final bool youHaveToPay = true;
+    /// ---------------- MOCK DATA ----------------
+    /// Later these will come from Provider / Firebase
+
+    final bool youHaveToPay = true; // false হলে receive
     final double balanceAmount = 350;
+
+    final int totalMeals = 189;
     final double mealRate = 65;
     final double yourCost = 1950;
     final double totalMessCost = 12300;
-    final int totalMeals = 189;
+
+    /// -------------------------------------------
 
     return Scaffold(
       appBar: AppBar(
@@ -31,7 +35,7 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            /// GRID SUMMARY
+            /// SUMMARY GRID
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -72,7 +76,9 @@ class DashboardScreen extends StatelessWidget {
   }
 }
 
-
+/// ------------------------------------------------------------
+/// PAY / RECEIVE CARD
+/// ------------------------------------------------------------
 class _BalanceStatusCard extends StatelessWidget {
   final bool isPay;
   final double amount;
@@ -119,7 +125,9 @@ class _BalanceStatusCard extends StatelessWidget {
   }
 }
 
-
+/// ------------------------------------------------------------
+/// MODERN INFO CARD
+/// ------------------------------------------------------------
 class _ModernInfoCard extends StatelessWidget {
   final String title;
   final String value;
@@ -166,4 +174,3 @@ class _ModernInfoCard extends StatelessWidget {
     );
   }
 }
-
