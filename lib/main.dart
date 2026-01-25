@@ -40,7 +40,7 @@ class MessMateApp extends StatelessWidget {
           '/forgot-password': (context) => const ForgotPasswordScreen(),
           '/profile-setup': (context) => const ProfileSetupScreen(),
           // Splash Screen থেকে নেভিগেট করার জন্য প্রয়োজনীয় রুটগুলি যোগ করুন
-          '/dining-select': (context) => const DiningSelectScreen(), // dining_select_screen.dart
+         // dining_select_screen.dart
           '/join-status': (context) => const JoinStatusScreen(), // join_status_screen.dart
           '/main-shell': (context) => const MainShell(), // main_shell.dart
         },

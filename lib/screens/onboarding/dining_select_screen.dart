@@ -1,7 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../main/main_shell.dart';
-import 'join_status_screen.dart';
 
 class DiningSelectScreen extends StatelessWidget {
   final bool isManager;
@@ -11,11 +13,102 @@ class DiningSelectScreen extends StatelessWidget {
     required this.isManager,
   });
 
+  String _generateDiningKey() {
+    final rand = Random();
+    return (100000 + rand.nextInt(900000)).toString();
+  }
+
+  void _showCreateDiningDialog(BuildContext context) {
+    final nameController = TextEditingController();
+    final monthController = TextEditingController();
+    final diningKey = _generateDiningKey();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Create Dining'),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                /// Dining Name
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Dining Name',
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                /// Month
+                TextField(
+                  controller: monthController,
+                  decoration: const InputDecoration(
+                    labelText: 'Month (e.g. January 2026)',
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                /// Dining Key + Copy
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        'Dining Key: $diningKey',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.copy),
+                      onPressed: () {
+                        Clipboard.setData(
+                          ClipboardData(text: diningKey),
+                        );
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Dining key copied'),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                // Later: save dining to Firebase
+
+                Navigator.pop(context); // close dialog
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MainShell(),
+                  ),
+                );
+              },
+              child: const Text('Explore Your Dining'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(isManager ? 'Create Dining' : 'Join Dining'),
+        title: const Text('Dining Setup'),
         centerTitle: true,
         automaticallyImplyLeading: false,
       ),
@@ -26,18 +119,10 @@ class DiningSelectScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 24),
 
-            /// MANAGER VIEW
-            if (isManager) ...[
+            if (isManager)
               ElevatedButton.icon(
                 onPressed: () {
-                  // Later: Firebase create dining + generate key
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const MainShell(),
-                    ),
-                  );
+                  _showCreateDiningDialog(context);
                 },
                 icon: const Icon(Icons.add),
                 label: const Text('Create New Dining'),
@@ -45,38 +130,6 @@ class DiningSelectScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
               ),
-            ],
-
-            /// MEMBER VIEW
-            if (!isManager) ...[
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Enter Dining Key',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              ElevatedButton(
-                onPressed: () {
-                  // Later: validate key + send join request
-
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const JoinStatusScreen(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-                child: const Text('Join Dining'),
-              ),
-            ],
           ],
         ),
       ),
