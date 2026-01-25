@@ -1,7 +1,49 @@
-import 'package:flutter/material.dart';
+import 'dart:io';
 
-class ProfileSetupScreen extends StatelessWidget {
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'role_selection_screen.dart';
+
+class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});
+
+  @override
+  State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
+}
+
+class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
+  File? _profileImage;
+
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+
+  String? _profession; // 🔹 dropdown value
+
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+
+    if (image != null) {
+      setState(() {
+        _profileImage = File(image.path);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // ✅ Controllers dispose (IMPORTANT)
+    _nameController.dispose();
+    _phoneController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,60 +51,126 @@ class ProfileSetupScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Set Up Profile'),
         centerTitle: true,
-        automaticallyImplyLeading: false, // You might want to control back navigation if needed
+        automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 24),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 24),
 
-            Center(
-              child: CircleAvatar(
-                radius: 45,
-                backgroundColor: Colors.grey.shade300,
-                child: const Icon(Icons.camera_alt, size: 30),
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Full Name',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              /// Profile Image Picker
+              Center(
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey.shade300,
+                    backgroundImage:
+                    _profileImage != null ? FileImage(_profileImage!) : null,
+                    child: _profileImage == null
+                        ? const Icon(Icons.camera_alt, size: 32)
+                        : null,
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Phone Number (optional)',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              const Center(
+                child: Text(
+                  'Tap to select profile picture',
+                  style: TextStyle(color: Colors.grey),
                 ),
               ),
-            ),
 
-            const Spacer(),
+              const SizedBox(height: 32),
 
-            ElevatedButton(
-              onPressed: () {
-                // mock complete profile
-                // Navigate to the next screen, e.g., dining selection or main shell
-                // Example: Navigator.pushReplacementNamed(context, '/dining-select');
-                print('Continue button pressed (mock action)');
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+              /// Full Name
+              TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Full Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
               ),
-              child: const Text('Continue'),
-            ),
-          ],
+
+              const SizedBox(height: 16),
+
+              /// Phone Number
+              TextField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              /// Address
+              TextField(
+                controller: _addressController,
+                decoration: InputDecoration(
+                  labelText: 'Address (optional)',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              /// Profession Dropdown
+              DropdownButtonFormField<String>(
+                value: _profession, // ✅ FIX
+                decoration: InputDecoration(
+                  labelText: 'Profession',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'Student', child: Text('Student')),
+                  DropdownMenuItem(value: 'Job', child: Text('Job')),
+                  DropdownMenuItem(value: 'Other', child: Text('Other')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _profession = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 32),
+
+              /// Continue Button
+              ElevatedButton(
+                onPressed: () {
+                  // Later: validation + Provider + Firebase save
+                  // Now: mock navigation
+
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const RoleSelectionScreen(),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+                child: const Text('Continue'),
+              ),
+            ],
+          ),
         ),
       ),
     );

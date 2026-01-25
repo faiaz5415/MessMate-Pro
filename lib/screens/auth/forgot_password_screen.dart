@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'forgot_password_confirmation_screen.dart';
+
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
 
@@ -28,7 +30,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             const SizedBox(height: 12),
 
             const Text(
-              'Enter your email and we’ll send you a reset Code.',
+              'Enter your email and we’ll send you a reset link.',
               style: TextStyle(color: Colors.grey),
             ),
 
@@ -47,15 +49,17 @@ class ForgotPasswordScreen extends StatelessWidget {
 
             ElevatedButton(
               onPressed: () {
-                // mock reset
-                // After sending the reset link, you might want to navigate back or to a confirmation screen
-                print('Send Reset Link button pressed (mock action)');
-                // Example: Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ForgotPasswordConfirmationScreen(),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              child: const Text('Send Reset Code'),
+              child: const Text('Send Reset Link'),
             ),
           ],
         ),
