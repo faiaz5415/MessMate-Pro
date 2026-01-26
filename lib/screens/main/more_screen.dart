@@ -4,9 +4,59 @@ import '../../utils/app_styles.dart';
 import '../../widgets/modern_card.dart';
 import '../sub/members_screen.dart';
 import '../sub/notices_screen.dart';
+import '../auth/sign_in_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
+
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
+          ),
+          title: Row(
+            children: const [
+              Icon(Icons.logout_outlined, color: AppColors.error),
+              SizedBox(width: 8),
+              Text('Log Out'),
+            ],
+          ),
+          content: const Text(
+            'Are you sure you want to log out?',
+            style: TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+              child: const Text('NO'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const SignInScreen(),
+                  ),
+                      (route) => false,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+              ),
+              child: const Text('YES'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,13 +201,13 @@ class MoreScreen extends StatelessWidget {
 
                 const SizedBox(height: AppStyles.spaceLarge),
 
-                /// LOGOUT BUTTON
+                /// LOGOUT BUTTON (ONLY LOGIC ADDED)
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppStyles.spaceLarge,
                   ),
                   child: OutlinedButton.icon(
-                    onPressed: () {},
+                    onPressed: () => _showLogoutConfirmation(context),
                     icon: const Icon(Icons.logout, color: AppColors.error),
                     label: const Text(
                       'Logout',
@@ -239,7 +289,6 @@ class _MenuTile extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          /// ICON
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -252,10 +301,7 @@ class _MenuTile extends StatelessWidget {
               size: 22,
             ),
           ),
-
           const SizedBox(width: AppStyles.spaceMedium),
-
-          /// TEXT
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,10 +322,7 @@ class _MenuTile extends StatelessWidget {
               ],
             ),
           ),
-
           const SizedBox(width: AppStyles.spaceSmall),
-
-          /// ARROW
           Icon(
             Icons.arrow_forward_ios_rounded,
             color: AppColors.textSecondary.withOpacity(0.4),
