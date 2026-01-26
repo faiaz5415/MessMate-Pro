@@ -3,157 +3,501 @@ import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
 import '../../widgets/modern_card.dart';
 
-class NoticesScreen extends StatelessWidget {
+class NoticesScreen extends StatefulWidget {
   const NoticesScreen({super.key});
+
+  @override
+  State<NoticesScreen> createState() => _NoticesScreenState();
+}
+
+class _NoticesScreenState extends State<NoticesScreen> {
+  String _selectedFilter = 'All';
 
   @override
   Widget build(BuildContext context) {
     /// ---------------- MOCK DATA ----------------
     final List<Map<String, dynamic>> notices = [
       {
-        'title': 'Meal Rate Updated',
-        'content': 'New meal rate is ৳65 per meal starting from tomorrow.',
-        'date': '22 Jan 2026',
+        'id': 1,
+        'title': 'Meal Rate Adjustment',
+        'body': 'Starting next month, meal rate will be adjusted to ৳70 per meal due to market price increase. Please plan accordingly.',
+        'author': 'Manager',
+        'date': '2 hours ago',
+        'isPinned': true,
         'isImportant': true,
+        'category': 'Announcement',
       },
       {
-        'title': 'Weekly Bazar Schedule',
-        'content': 'This week\'s bazar will be on Monday and Thursday.',
-        'date': '20 Jan 2026',
+        'id': 2,
+        'title': 'Weekly Cleanup Schedule',
+        'body': 'This week\'s cleanup duty: Monday - Karim, Tuesday - Rahim, Wednesday - You, Thursday - Salman, Friday - Jamal.',
+        'author': 'Manager',
+        'date': 'Yesterday',
+        'isPinned': true,
         'isImportant': false,
+        'category': 'Schedule',
       },
       {
-        'title': 'Deposit Reminder',
-        'content': 'Please submit your monthly deposit by 25th Jan.',
-        'date': '18 Jan 2026',
+        'id': 3,
+        'title': 'Gas Cylinder Refill',
+        'body': 'Gas cylinder will be refilled this Friday. Additional ৳50 will be added to everyone\'s cost share.',
+        'author': 'Karim',
+        'date': '2 days ago',
+        'isPinned': false,
+        'isImportant': false,
+        'category': 'Update',
+      },
+      {
+        'id': 4,
+        'title': 'Weekend Guest Policy',
+        'body': 'Reminder: If bringing guests on weekends, please inform manager 1 day before. Extra meal costs apply.',
+        'author': 'Manager',
+        'date': '3 days ago',
+        'isPinned': false,
+        'isImportant': false,
+        'category': 'Policy',
+      },
+      {
+        'id': 5,
+        'title': 'Monthly Meeting',
+        'body': 'Next monthly mess meeting scheduled for January 25th at 8 PM. Attendance is mandatory.',
+        'author': 'Manager',
+        'date': '4 days ago',
+        'isPinned': false,
         'isImportant': true,
-      },
-      {
-        'title': 'Guest Meal Policy',
-        'content': 'Guest meals must be informed 1 day in advance.',
-        'date': '15 Jan 2026',
-        'isImportant': false,
+        'category': 'Event',
       },
     ];
+
+    final filteredNotices = _selectedFilter == 'All'
+        ? notices
+        : notices.where((n) => n['category'] == _selectedFilter).toList();
+
+    final pinnedNotices = filteredNotices.where((n) => n['isPinned'] == true).toList();
+    final regularNotices = filteredNotices.where((n) => n['isPinned'] == false).toList();
 
     /// -------------------------------------------
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Notices'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Column(
+          children: [
+            Text(
+              'Notices',
+              style: AppStyles.heading3.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
+              ),
+            ),
+            Text(
+              'Community Board',
+              style: AppStyles.caption.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 12),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.search_outlined),
+              onPressed: () {},
+            ),
+          ),
+        ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(AppStyles.spaceMedium),
-        itemCount: notices.length,
-        itemBuilder: (context, index) {
-          final notice = notices[index];
-          return _NoticeCard(
-            title: notice['title'],
-            content: notice['content'],
-            date: notice['date'],
-            isImportant: notice['isImportant'],
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Add notice (manager only)
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('Add Notice'),
-      ),
-    );
-  }
-}
-
-/// NOTICE CARD
-class _NoticeCard extends StatelessWidget {
-  final String title;
-  final String content;
-  final String date;
-  final bool isImportant;
-
-  const _NoticeCard({
-    required this.title,
-    required this.content,
-    required this.date,
-    required this.isImportant,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return ModernCard(
-      margin: const EdgeInsets.only(bottom: AppStyles.spaceMedium),
-      padding: const EdgeInsets.all(AppStyles.spaceMedium),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.blue.withOpacity(0.03),
+              AppColors.background,
+            ],
+            stops: const [0.0, 0.3],
+          ),
+        ),
+        child: SafeArea(
+          child: Column(
             children: [
-              if (isImportant) ...[
-                Container(
+              const SizedBox(height: AppStyles.spaceMedium),
+
+              /// FILTER CHIPS
+              _FilterChips(
+                selectedFilter: _selectedFilter,
+                onFilterChanged: (filter) {
+                  setState(() => _selectedFilter = filter);
+                },
+              ),
+
+              const SizedBox(height: AppStyles.spaceLarge),
+
+              /// PINNED NOTICES SECTION
+              if (pinnedNotices.isNotEmpty) ...[
+                Padding(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: AppStyles.spaceSmall,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.error.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(AppStyles.radiusSmall),
+                    horizontal: AppStyles.spaceLarge,
                   ),
                   child: Row(
                     children: [
                       Icon(
-                        Icons.priority_high,
-                        color: AppColors.error,
-                        size: 14,
+                        Icons.push_pin,
+                        size: 16,
+                        color: AppColors.warning,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppStyles.spaceSmall),
                       Text(
-                        'Important',
-                        style: AppStyles.caption.copyWith(
-                          color: AppColors.error,
-                          fontWeight: FontWeight.w600,
+                        'Pinned',
+                        style: AppStyles.bodySmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textSecondary,
+                          letterSpacing: 0.5,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: AppStyles.spaceSmall),
+                const SizedBox(height: AppStyles.spaceMedium),
+                ...pinnedNotices.map((notice) => _NoticeCard(
+                  notice: notice,
+                  isPinned: true,
+                )),
+                const SizedBox(height: AppStyles.spaceLarge),
               ],
-              Expanded(
-                child: Text(
-                  title,
-                  style: AppStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
+
+              /// RECENT NOTICES SECTION
+              if (regularNotices.isNotEmpty) ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppStyles.spaceLarge,
                   ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        height: 20,
+                        decoration: BoxDecoration(
+                          color: AppColors.blue,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      const SizedBox(width: AppStyles.spaceSmall),
+                      Text(
+                        'Recent',
+                        style: AppStyles.bodySmall.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textSecondary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppStyles.spaceMedium),
+              ],
+
+              /// NOTICES LIST
+              Expanded(
+                child: ListView.builder(
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppStyles.spaceLarge,
+                    0,
+                    AppStyles.spaceLarge,
+                    AppStyles.spaceLarge,
+                  ),
+                  itemCount: regularNotices.length,
+                  itemBuilder: (context, index) {
+                    return _NoticeCard(
+                      notice: regularNotices[index],
+                      isPinned: false,
+                    );
+                  },
                 ),
               ),
             ],
           ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {},
+        icon: const Icon(Icons.add_rounded),
+        label: const Text('Post Notice'),
+        backgroundColor: AppColors.blue,
+      ),
+    );
+  }
+}
 
-          const SizedBox(height: AppStyles.spaceSmall),
+/// ------------------------------------------------------------
+/// FILTER CHIPS
+/// ------------------------------------------------------------
+class _FilterChips extends StatelessWidget {
+  final String selectedFilter;
+  final ValueChanged<String> onFilterChanged;
 
-          Text(
-            content,
-            style: AppStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+  const _FilterChips({
+    required this.selectedFilter,
+    required this.onFilterChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final filters = ['All', 'Announcement', 'Schedule', 'Update', 'Policy', 'Event'];
+
+    return SizedBox(
+      height: 40,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: AppStyles.spaceLarge),
+        physics: const BouncingScrollPhysics(),
+        itemCount: filters.length,
+        itemBuilder: (context, index) {
+          final filter = filters[index];
+          final isSelected = filter == selectedFilter;
+
+          return Container(
+            margin: EdgeInsets.only(
+              right: index < filters.length - 1 ? AppStyles.spaceSmall : 0,
             ),
+            child: FilterChip(
+              label: Text(filter),
+              selected: isSelected,
+              onSelected: (_) => onFilterChanged(filter),
+              backgroundColor: AppColors.surface,
+              selectedColor: AppColors.blue.withOpacity(0.15),
+              checkmarkColor: AppColors.blue,
+              labelStyle: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? AppColors.blue : AppColors.textSecondary,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: BorderSide(
+                  color: isSelected
+                      ? AppColors.blue.withOpacity(0.3)
+                      : AppColors.border,
+                  width: 1,
+                ),
+              ),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// ------------------------------------------------------------
+/// NOTICE CARD (Premium Community Board Style)
+/// ------------------------------------------------------------
+class _NoticeCard extends StatelessWidget {
+  final Map<String, dynamic> notice;
+  final bool isPinned;
+
+  const _NoticeCard({
+    required this.notice,
+    required this.isPinned,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isImportant = notice['isImportant'] as bool;
+    final accentColor = isImportant ? AppColors.warning : AppColors.blue;
+
+    return ModernCard(
+      margin: const EdgeInsets.only(bottom: AppStyles.spaceMedium),
+      padding: const EdgeInsets.all(AppStyles.spaceMedium),
+      color: isPinned
+          ? AppColors.warning.withOpacity(0.03)
+          : isImportant
+          ? AppColors.warning.withOpacity(0.02)
+          : null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// HEADER ROW
+          Row(
+            children: [
+              /// CATEGORY BADGE
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _getCategoryIcon(notice['category']),
+                      size: 12,
+                      color: accentColor,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      notice['category'],
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: accentColor,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Spacer(),
+
+              /// PINNED INDICATOR
+              if (isPinned)
+                Icon(
+                  Icons.push_pin,
+                  size: 16,
+                  color: AppColors.warning.withOpacity(0.6),
+                ),
+            ],
           ),
 
           const SizedBox(height: AppStyles.spaceMedium),
 
+          /// TITLE
+          Text(
+            notice['title'],
+            style: AppStyles.bodyLarge.copyWith(
+              fontWeight: FontWeight.w800,
+              height: 1.3,
+            ),
+          ),
+
+          const SizedBox(height: AppStyles.spaceSmall),
+
+          /// BODY PREVIEW
+          Text(
+            notice['body'],
+            style: AppStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+              height: 1.5,
+            ),
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+          ),
+
+          const SizedBox(height: AppStyles.spaceMedium),
+
+          /// FOOTER
           Row(
             children: [
-              Icon(
-                Icons.calendar_today,
-                size: 14,
-                color: AppColors.textSecondary,
+              /// AUTHOR AVATAR + NAME
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    notice['author'][0],
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: accentColor,
+                    ),
+                  ),
+                ),
               ),
-              const SizedBox(width: AppStyles.spaceXSmall),
+
+              const SizedBox(width: AppStyles.spaceSmall),
+
               Text(
-                date,
+                notice['author'],
+                style: AppStyles.caption.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+
+              const SizedBox(width: AppStyles.spaceSmall),
+
+              Container(
+                width: 3,
+                height: 3,
+                decoration: BoxDecoration(
+                  color: AppColors.textSecondary.withOpacity(0.4),
+                  shape: BoxShape.circle,
+                ),
+              ),
+
+              const SizedBox(width: AppStyles.spaceSmall),
+
+              Text(
+                notice['date'],
                 style: AppStyles.caption.copyWith(
                   color: AppColors.textSecondary,
+                ),
+              ),
+
+              const Spacer(),
+
+              /// READ MORE BUTTON
+              InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(6),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: accentColor.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Read',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: accentColor,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 12,
+                        color: accentColor,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -161,5 +505,22 @@ class _NoticeCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Announcement':
+        return Icons.campaign_outlined;
+      case 'Schedule':
+        return Icons.calendar_today_outlined;
+      case 'Update':
+        return Icons.info_outline;
+      case 'Policy':
+        return Icons.gavel_outlined;
+      case 'Event':
+        return Icons.event_outlined;
+      default:
+        return Icons.article_outlined;
+    }
   }
 }

@@ -3,178 +3,352 @@ import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
 import '../../widgets/modern_card.dart';
 
-class NotificationsScreen extends StatelessWidget {
+class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
+  State<NotificationsScreen> createState() => _NotificationsScreenState();
+}
+
+class _NotificationsScreenState extends State<NotificationsScreen> {
+  @override
   Widget build(BuildContext context) {
     /// ---------------- MOCK DATA ----------------
-    final List<Map<String, dynamic>> notifications = [
+    final List<Map<String, dynamic>> todayNotifications = [
       {
+        'id': 1,
+        'type': 'success',
+        'icon': Icons.check_circle_outline,
         'title': 'Join Request Approved',
-        'message': 'Welcome to Green House Mess!',
+        'body': 'Your request to join "Green House Mess" has been approved by the manager.',
         'time': '2 hours ago',
         'isRead': false,
-        'type': 'success',
       },
       {
-        'title': 'Meal Locked',
-        'message': 'Day 15 meals have been locked by manager.',
+        'id': 2,
+        'type': 'info',
+        'icon': Icons.article_outlined,
+        'title': 'New Notice Posted',
+        'body': 'Manager posted: "Meal Rate Adjustment"',
         'time': '5 hours ago',
         'isRead': false,
-        'type': 'info',
-      },
-      {
-        'title': 'New Notice Posted',
-        'message': 'Meal Rate Updated - Check notices.',
-        'time': 'Yesterday',
-        'isRead': true,
-        'type': 'warning',
-      },
-      {
-        'title': 'Deposit Reminder',
-        'message': 'Please submit your monthly deposit.',
-        'time': '2 days ago',
-        'isRead': true,
-        'type': 'info',
       },
     ];
+
+    final List<Map<String, dynamic>> yesterdayNotifications = [
+      {
+        'id': 3,
+        'type': 'warning',
+        'icon': Icons.lock_clock_outlined,
+        'title': 'Meal Lock Applied',
+        'body': 'Monthly meal calculation has been locked by the manager.',
+        'time': 'Yesterday, 11:30 PM',
+        'isRead': true,
+      },
+      {
+        'id': 4,
+        'type': 'success',
+        'icon': Icons.payments_outlined,
+        'title': 'Deposit Confirmed',
+        'body': 'Your deposit of ৳500 has been recorded.',
+        'time': 'Yesterday, 2:45 PM',
+        'isRead': true,
+      },
+    ];
+
+    final List<Map<String, dynamic>> olderNotifications = [
+      {
+        'id': 5,
+        'type': 'info',
+        'icon': Icons.shopping_bag_outlined,
+        'title': 'Bazar Added',
+        'body': 'Manager added a bazar entry of ৳450.',
+        'time': '2 days ago',
+        'isRead': true,
+      },
+      {
+        'id': 6,
+        'type': 'info',
+        'icon': Icons.restaurant_menu_outlined,
+        'title': 'Meal Updated',
+        'body': 'Your meal count has been updated: +3 meals.',
+        'time': '3 days ago',
+        'isRead': true,
+      },
+    ];
+
+    final unreadCount = todayNotifications.where((n) => !n['isRead']).length +
+        yesterdayNotifications.where((n) => !n['isRead']).length +
+        olderNotifications.where((n) => !n['isRead']).length;
 
     /// -------------------------------------------
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Notifications'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Mark all as read
-            },
-            child: Text(
-              'Mark All Read',
-              style: TextStyle(
-                color: AppColors.primary,
-                fontSize: 12,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Column(
+          children: [
+            Text(
+              'Notifications',
+              style: AppStyles.heading3.copyWith(
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.5,
               ),
             ),
-          ),
+            if (unreadCount > 0)
+              Text(
+                '$unreadCount unread',
+                style: AppStyles.caption.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+          ],
+        ),
+        actions: [
+          if (unreadCount > 0)
+            Container(
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.done_all_outlined),
+                tooltip: 'Mark all as read',
+                onPressed: () {},
+              ),
+            ),
         ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(AppStyles.spaceMedium),
-        itemCount: notifications.length,
-        itemBuilder: (context, index) {
-          final notification = notifications[index];
-          return _NotificationCard(
-            title: notification['title'],
-            message: notification['message'],
-            time: notification['time'],
-            isRead: notification['isRead'],
-            type: notification['type'],
-          );
-        },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.primary.withOpacity(0.03),
+              AppColors.background,
+            ],
+            stops: const [0.0, 0.3],
+          ),
+        ),
+        child: SafeArea(
+          child: todayNotifications.isEmpty &&
+              yesterdayNotifications.isEmpty &&
+              olderNotifications.isEmpty
+              ? _EmptyState()
+              : ListView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(
+              vertical: AppStyles.spaceMedium,
+            ),
+            children: [
+              /// TODAY SECTION
+              if (todayNotifications.isNotEmpty) ...[
+                _SectionHeader(label: 'Today'),
+                ...todayNotifications.map((notification) =>
+                    _NotificationCard(notification: notification)),
+                const SizedBox(height: AppStyles.spaceLarge),
+              ],
+
+              /// YESTERDAY SECTION
+              if (yesterdayNotifications.isNotEmpty) ...[
+                _SectionHeader(label: 'Yesterday'),
+                ...yesterdayNotifications.map((notification) =>
+                    _NotificationCard(notification: notification)),
+                const SizedBox(height: AppStyles.spaceLarge),
+              ],
+
+              /// OLDER SECTION
+              if (olderNotifications.isNotEmpty) ...[
+                _SectionHeader(label: 'Older'),
+                ...olderNotifications.map((notification) =>
+                    _NotificationCard(notification: notification)),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
 }
 
-/// NOTIFICATION CARD
-class _NotificationCard extends StatelessWidget {
-  final String title;
-  final String message;
-  final String time;
-  final bool isRead;
-  final String type; // success, info, warning, error
+/// ------------------------------------------------------------
+/// SECTION HEADER
+/// ------------------------------------------------------------
+class _SectionHeader extends StatelessWidget {
+  final String label;
 
-  const _NotificationCard({
-    required this.title,
-    required this.message,
-    required this.time,
-    required this.isRead,
-    required this.type,
-  });
+  const _SectionHeader({required this.label});
 
   @override
   Widget build(BuildContext context) {
-    final Color typeColor = _getTypeColor();
-    final IconData typeIcon = _getTypeIcon();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        AppStyles.spaceLarge,
+        AppStyles.spaceMedium,
+        AppStyles.spaceLarge,
+        AppStyles.spaceMedium,
+      ),
+      child: Text(
+        label,
+        style: AppStyles.bodySmall.copyWith(
+          fontWeight: FontWeight.w700,
+          color: AppColors.textSecondary,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
 
-    return ModernCard(
-      margin: const EdgeInsets.only(bottom: AppStyles.spaceSmall),
-      padding: const EdgeInsets.all(AppStyles.spaceMedium),
-      color: isRead
-          ? AppColors.cardBackground
-          : AppColors.primary.withOpacity(0.03),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppStyles.spaceSmall),
-            decoration: BoxDecoration(
-              color: typeColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppStyles.radiusSmall),
-            ),
-            child: Icon(
-              typeIcon,
-              color: typeColor,
-              size: 20,
-            ),
-          ),
+/// ------------------------------------------------------------
+/// NOTIFICATION CARD (Timeline Style)
+/// ------------------------------------------------------------
+class _NotificationCard extends StatelessWidget {
+  final Map<String, dynamic> notification;
 
-          const SizedBox(width: AppStyles.spaceMedium),
+  const _NotificationCard({required this.notification});
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+  @override
+  Widget build(BuildContext context) {
+    final isRead = notification['isRead'] as bool;
+    final type = notification['type'] as String;
+    final iconColor = _getTypeColor(type);
+
+    return Container(
+      margin: const EdgeInsets.only(
+        left: AppStyles.spaceLarge,
+        right: AppStyles.spaceLarge,
+        bottom: AppStyles.spaceSmall,
+      ),
+      child: ModernCard(
+        padding: const EdgeInsets.all(AppStyles.spaceMedium),
+        color: isRead ? null : AppColors.primary.withOpacity(0.02),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// ICON CONTAINER
+            Stack(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: AppStyles.bodyMedium.copyWith(
-                          fontWeight: isRead ? FontWeight.w500 : FontWeight.bold,
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: iconColor.withOpacity(0.2),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Icon(
+                    notification['icon'],
+                    color: iconColor,
+                    size: 22,
+                  ),
+                ),
+
+                /// UNREAD INDICATOR
+                if (!isRead)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.surface,
+                          width: 2,
                         ),
                       ),
                     ),
-                    if (!isRead)
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.primary,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                  ],
-                ),
-
-                const SizedBox(height: AppStyles.spaceXSmall),
-
-                Text(
-                  message,
-                  style: AppStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
                   ),
-                ),
-
-                const SizedBox(height: AppStyles.spaceSmall),
-
-                Text(
-                  time,
-                  style: AppStyles.caption.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
               ],
             ),
-          ),
-        ],
+
+            const SizedBox(width: AppStyles.spaceMedium),
+
+            /// CONTENT
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// TITLE
+                  Text(
+                    notification['title'],
+                    style: AppStyles.bodyMedium.copyWith(
+                      fontWeight: isRead ? FontWeight.w600 : FontWeight.w800,
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  /// BODY
+                  Text(
+                    notification['body'],
+                    style: AppStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      height: 1.4,
+                    ),
+                  ),
+
+                  const SizedBox(height: AppStyles.spaceSmall),
+
+                  /// TIME
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.access_time_outlined,
+                        size: 12,
+                        color: AppColors.textSecondary.withOpacity(0.6),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        notification['time'],
+                        style: AppStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            /// ACTION BUTTON
+            InkWell(
+              onTap: () {},
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                child: Icon(
+                  Icons.more_vert_rounded,
+                  size: 18,
+                  color: AppColors.textSecondary.withOpacity(0.5),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Color _getTypeColor() {
+  Color _getTypeColor(String type) {
     switch (type) {
       case 'success':
         return AppColors.success;
@@ -182,21 +356,55 @@ class _NotificationCard extends StatelessWidget {
         return AppColors.warning;
       case 'error':
         return AppColors.error;
+      case 'info':
       default:
-        return AppColors.info;
+        return AppColors.blue;
     }
   }
+}
 
-  IconData _getTypeIcon() {
-    switch (type) {
-      case 'success':
-        return Icons.check_circle_outline;
-      case 'warning':
-        return Icons.warning_amber_outlined;
-      case 'error':
-        return Icons.error_outline;
-      default:
-        return Icons.info_outline;
-    }
+/// ------------------------------------------------------------
+/// EMPTY STATE
+/// ------------------------------------------------------------
+class _EmptyState extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppStyles.spaceXLarge),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.08),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.notifications_none_outlined,
+              size: 64,
+              color: AppColors.primary.withOpacity(0.4),
+            ),
+          ),
+
+          const SizedBox(height: AppStyles.spaceLarge),
+
+          Text(
+            'No Notifications',
+            style: AppStyles.heading3.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+
+          const SizedBox(height: AppStyles.spaceSmall),
+
+          Text(
+            'You\'re all caught up!',
+            style: AppStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary.withOpacity(0.7),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

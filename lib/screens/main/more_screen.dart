@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
 import '../../widgets/modern_card.dart';
+import '../sub/members_screen.dart';
+import '../sub/notices_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
@@ -9,245 +11,280 @@ class MoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('More'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(AppStyles.spaceMedium),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            /// USER PROFILE CARD
-            ModernCard(
-              margin: const EdgeInsets.only(bottom: AppStyles.spaceLarge),
-              padding: const EdgeInsets.all(AppStyles.spaceMedium),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 32,
-                    backgroundColor: AppColors.primary.withOpacity(0.1),
-                    child: Text(
-                      'FM',
-                      style: AppStyles.heading3.copyWith(
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppStyles.spaceMedium),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Faiaz Hasan',
-                          style: AppStyles.bodyLarge.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+      backgroundColor: AppColors.background,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.primary.withOpacity(0.03),
+              AppColors.background,
+            ],
+            stops: const [0.0, 0.3],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// HEADER
+                Padding(
+                  padding: const EdgeInsets.all(AppStyles.spaceLarge),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'More Options',
+                        style: AppStyles.heading2.copyWith(
+                          fontWeight: FontWeight.w800,
                         ),
-                        const SizedBox(height: AppStyles.spaceXSmall),
-                        Text(
-                          'Member',
-                          style: AppStyles.bodySmall.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.edit_outlined),
-                    color: AppColors.primary,
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ),
-
-            /// SETTINGS SECTION
-            Text(
-              'Settings',
-              style: AppStyles.heading3,
-            ),
-            const SizedBox(height: AppStyles.spaceMedium),
-
-            _MoreTile(
-              icon: Icons.person_outline,
-              title: 'Profile',
-              onTap: () {},
-            ),
-            _MoreTile(
-              icon: Icons.notifications_outlined,
-              title: 'Notifications',
-              onTap: () {},
-            ),
-            _MoreTile(
-              icon: Icons.people_outline,
-              title: 'Members',
-              onTap: () {},
-            ),
-            _MoreTile(
-              icon: Icons.settings_outlined,
-              title: 'App Settings',
-              onTap: () {},
-            ),
-
-            const SizedBox(height: AppStyles.spaceLarge),
-
-            /// SUPPORT SECTION
-            Text(
-              'Support',
-              style: AppStyles.heading3,
-            ),
-            const SizedBox(height: AppStyles.spaceMedium),
-
-            _MoreTile(
-              icon: Icons.help_outline,
-              title: 'Help & Support',
-              onTap: () {},
-            ),
-            _MoreTile(
-              icon: Icons.privacy_tip_outlined,
-              title: 'Privacy Policy',
-              onTap: () {},
-            ),
-            _MoreTile(
-              icon: Icons.info_outline,
-              title: 'About',
-              onTap: () {},
-            ),
-
-            const SizedBox(height: AppStyles.spaceLarge),
-
-            /// LOGOUT BUTTON
-            ModernCard(
-              padding: const EdgeInsets.all(AppStyles.spaceMedium),
-              onTap: () {
-                _showLogoutDialog(context);
-              },
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(AppStyles.spaceSmall),
-                    decoration: BoxDecoration(
-                      color: AppColors.error.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(AppStyles.radiusSmall),
-                    ),
-                    child: Icon(
-                      Icons.logout,
-                      color: AppColors.error,
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: AppStyles.spaceMedium),
-                  Expanded(
-                    child: Text(
-                      'Logout',
-                      style: AppStyles.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.error,
                       ),
-                    ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Settings & additional features',
+                        style: AppStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
-                  Icon(
-                    Icons.chevron_right,
-                    color: AppColors.error,
-                    size: 20,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: AppStyles.spaceLarge),
-
-            /// APP VERSION
-            Center(
-              child: Text(
-                'MessMate Pro v1.0.0',
-                style: AppStyles.caption.copyWith(
-                  color: AppColors.textSecondary,
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-        ),
-        title: Text(
-          'Logout',
-          style: AppStyles.heading3,
-        ),
-        content: Text(
-          'Are you sure you want to logout?',
-          style: AppStyles.bodyMedium,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Navigate to sign in (later with provider logic)
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
+                const SizedBox(height: AppStyles.spaceSmall),
+
+                /// DINING SECTION
+                _SectionHeader(title: 'Dining Management'),
+                const SizedBox(height: AppStyles.spaceSmall),
+
+                _MenuTile(
+                  icon: Icons.group_outlined,
+                  title: 'Members',
+                  subtitle: 'View all dining members',
+                  color: AppColors.blue,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MembersScreen(),
+                      ),
+                    );
+                  },
+                ),
+
+                _MenuTile(
+                  icon: Icons.campaign_outlined,
+                  title: 'Notices',
+                  subtitle: 'View important announcements',
+                  color: AppColors.orange,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NoticesScreen(),
+                      ),
+                    );
+                  },
+                ),
+
+                _MenuTile(
+                  icon: Icons.table_chart_outlined,
+                  title: 'Meal Table',
+                  subtitle: 'Daily meal tracking',
+                  color: AppColors.purple,
+                  onTap: () {},
+                ),
+
+                const SizedBox(height: AppStyles.spaceLarge),
+
+                /// ACCOUNT SECTION
+                _SectionHeader(title: 'Account & Settings'),
+                const SizedBox(height: AppStyles.spaceSmall),
+
+                _MenuTile(
+                  icon: Icons.person_outline,
+                  title: 'Profile',
+                  subtitle: 'Manage your profile',
+                  color: AppColors.teal,
+                  onTap: () {},
+                ),
+
+                _MenuTile(
+                  icon: Icons.settings_outlined,
+                  title: 'Settings',
+                  subtitle: 'App preferences',
+                  color: AppColors.blue,
+                  onTap: () {},
+                ),
+
+                const SizedBox(height: AppStyles.spaceLarge),
+
+                /// HELP SECTION
+                _SectionHeader(title: 'Help & Support'),
+                const SizedBox(height: AppStyles.spaceSmall),
+
+                _MenuTile(
+                  icon: Icons.help_outline,
+                  title: 'Help Center',
+                  subtitle: 'FAQs and support',
+                  color: AppColors.info,
+                  onTap: () {},
+                ),
+
+                _MenuTile(
+                  icon: Icons.feedback_outlined,
+                  title: 'Send Feedback',
+                  subtitle: 'Share your thoughts',
+                  color: AppColors.warning,
+                  onTap: () {},
+                ),
+
+                _MenuTile(
+                  icon: Icons.info_outline,
+                  title: 'About',
+                  subtitle: 'App version & info',
+                  color: AppColors.textSecondary,
+                  onTap: () {},
+                ),
+
+                const SizedBox(height: AppStyles.spaceLarge),
+
+                /// LOGOUT BUTTON
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppStyles.spaceLarge,
+                  ),
+                  child: OutlinedButton.icon(
+                    onPressed: () {},
+                    icon: const Icon(Icons.logout, color: AppColors.error),
+                    label: const Text(
+                      'Logout',
+                      style: TextStyle(color: AppColors.error),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: AppColors.error),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      minimumSize: const Size(double.infinity, 48),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: AppStyles.spaceXLarge),
+              ],
             ),
-            child: const Text('Logout'),
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
-/// MORE TILE WIDGET
-class _MoreTile extends StatelessWidget {
+/// ------------------------------------------------------------
+/// SECTION HEADER
+/// ------------------------------------------------------------
+class _SectionHeader extends StatelessWidget {
+  final String title;
+
+  const _SectionHeader({required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppStyles.spaceLarge,
+      ),
+      child: Text(
+        title,
+        style: AppStyles.bodySmall.copyWith(
+          fontWeight: FontWeight.w700,
+          color: AppColors.textSecondary,
+          letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+}
+
+/// ------------------------------------------------------------
+/// MENU TILE
+/// ------------------------------------------------------------
+class _MenuTile extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String subtitle;
+  final Color color;
   final VoidCallback onTap;
 
-  const _MoreTile({
+  const _MenuTile({
     required this.icon,
     required this.title,
+    required this.subtitle,
+    required this.color,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return ModernCard(
-      margin: const EdgeInsets.only(bottom: AppStyles.spaceSmall),
+      margin: const EdgeInsets.symmetric(
+        horizontal: AppStyles.spaceLarge,
+        vertical: 4,
+      ),
       padding: const EdgeInsets.all(AppStyles.spaceMedium),
       onTap: onTap,
       child: Row(
         children: [
+          /// ICON
           Container(
-            padding: const EdgeInsets.all(AppStyles.spaceSmall),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppStyles.radiusSmall),
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: Icon(icon, color: AppColors.primary, size: 20),
+            child: Icon(
+              icon,
+              color: color,
+              size: 22,
+            ),
           ),
+
           const SizedBox(width: AppStyles.spaceMedium),
+
+          /// TEXT
           Expanded(
-            child: Text(
-              title,
-              style: AppStyles.bodyMedium.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: AppStyles.caption.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
           ),
-          Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 20),
+
+          const SizedBox(width: AppStyles.spaceSmall),
+
+          /// ARROW
+          Icon(
+            Icons.arrow_forward_ios_rounded,
+            color: AppColors.textSecondary.withOpacity(0.4),
+            size: 16,
+          ),
         ],
       ),
     );

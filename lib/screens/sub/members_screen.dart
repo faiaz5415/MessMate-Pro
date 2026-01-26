@@ -11,147 +11,175 @@ class MembersScreen extends StatelessWidget {
     /// ---------------- MOCK DATA ----------------
     final List<Map<String, dynamic>> members = [
       {
-        'name': 'Ahmed Khan',
+        'name': 'You (Faiaz)',
         'role': 'Manager',
-        'totalMeals': 45,
+        'meals': 189,
+        'balance': 350.0,
+        'isActive': true,
+      },
+      {
+        'name': 'Karim Ahmed',
+        'role': 'Member',
+        'meals': 165,
         'balance': -120.0,
-        'isActive': true,
-      },
-      {
-        'name': 'Rafiq Islam',
-        'role': 'Member',
-        'totalMeals': 38,
-        'balance': 50.0,
-        'isActive': true,
-      },
-      {
-        'name': 'Kamal Hossain',
-        'role': 'Member',
-        'totalMeals': 42,
-        'balance': -80.0,
-        'isActive': true,
-      },
-      {
-        'name': 'Jamal Ahmed',
-        'role': 'Member',
-        'totalMeals': 40,
-        'balance': 0.0,
         'isActive': true,
       },
       {
         'name': 'Rahim Uddin',
         'role': 'Member',
-        'totalMeals': 35,
-        'balance': 150.0,
+        'meals': 178,
+        'balance': 80.0,
+        'isActive': true,
+      },
+      {
+        'name': 'Sakib Hassan',
+        'role': 'Member',
+        'meals': 142,
+        'balance': -80.0,
+        'isActive': true,
+      },
+      {
+        'name': 'Tanvir Islam',
+        'role': 'Member',
+        'meals': 156,
+        'balance': 45.0,
         'isActive': false,
       },
     ];
 
+    final int totalMembers = members.length;
     final int activeMembers = members.where((m) => m['isActive']).length;
-
+    final double totalBalance = members.fold(0, (sum, m) => sum + (m['balance'] as double));
     /// -------------------------------------------
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Members'),
       ),
-      body: Column(
-        children: [
-          /// MEMBER COUNT CARD
-          Container(
-            margin: const EdgeInsets.all(AppStyles.spaceMedium),
-            padding: const EdgeInsets.all(AppStyles.spaceMedium),
-            decoration: AppStyles.coloredCardDecoration(AppColors.blue),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _MemberStat(
-                  label: 'Total Members',
-                  value: members.length.toString(),
-                  icon: Icons.people_outline,
-                ),
-                Container(
-                  width: 1,
-                  height: 40,
-                  color: AppColors.border,
-                ),
-                _MemberStat(
-                  label: 'Active Members',
-                  value: activeMembers.toString(),
-                  icon: Icons.person_outline,
-                ),
-              ],
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppColors.blue.withOpacity(0.03),
+              AppColors.background,
+            ],
+            stops: const [0.0, 0.3],
           ),
-
-          /// MEMBERS LIST
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.fromLTRB(
-                AppStyles.spaceMedium,
-                0,
-                AppStyles.spaceMedium,
-                AppStyles.spaceMedium,
+        ),
+        child: Column(
+          children: [
+            /// MEMBER COUNT CARD
+            Container(
+              margin: const EdgeInsets.all(AppStyles.spaceMedium),
+              padding: const EdgeInsets.all(AppStyles.spaceMedium),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    AppColors.blue,
+                    AppColors.blue.withOpacity(0.85),
+                  ],
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.blue.withOpacity(0.3),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              itemCount: members.length,
-              itemBuilder: (context, index) {
-                final member = members[index];
-                return _MemberCard(
-                  name: member['name'],
-                  role: member['role'],
-                  totalMeals: member['totalMeals'],
-                  balance: member['balance'],
-                  isActive: member['isActive'],
-                );
-              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _StatItem(
+                    label: 'Total',
+                    value: totalMembers.toString(),
+                  ),
+                  Container(
+                    width: 1,
+                    height: 40,
+                    color: Colors.white.withOpacity(0.3),
+                  ),
+                  _StatItem(
+                    label: 'Active',
+                    value: activeMembers.toString(),
+                  ),
+                  Container(
+                    width: 1,
+                    height: 40,
+                    color: Colors.white.withOpacity(0.3),
+                  ),
+                  _StatItem(
+                    label: 'Balance',
+                    value: '৳${totalBalance.toStringAsFixed(0)}',
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          // Invite member
-        },
-        icon: const Icon(Icons.person_add),
-        label: const Text('Invite Member'),
+
+            /// MEMBERS LIST
+            Expanded(
+              child: ListView.builder(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(
+                  AppStyles.spaceMedium,
+                  0,
+                  AppStyles.spaceMedium,
+                  AppStyles.spaceMedium,
+                ),
+                itemCount: members.length,
+                itemBuilder: (context, index) {
+                  final member = members[index];
+                  return _MemberCard(
+                    name: member['name'],
+                    role: member['role'],
+                    meals: member['meals'],
+                    balance: member['balance'],
+                    isActive: member['isActive'],
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// MEMBER STAT
-class _MemberStat extends StatelessWidget {
+class _StatItem extends StatelessWidget {
   final String label;
   final String value;
-  final IconData icon;
 
-  const _MemberStat({
+  const _StatItem({
     required this.label,
     required this.value,
-    required this.icon,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(
-          icon,
-          color: AppColors.blue,
-          size: 28,
-        ),
-        const SizedBox(height: AppStyles.spaceSmall),
         Text(
           value,
-          style: AppStyles.heading2.copyWith(
-            color: AppColors.blue,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w900,
+            color: Colors.white,
+            height: 1,
           ),
         ),
-        const SizedBox(height: AppStyles.spaceXSmall),
+        const SizedBox(height: 4),
         Text(
           label,
-          style: AppStyles.caption.copyWith(
-            fontWeight: FontWeight.w500,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: Colors.white.withOpacity(0.8),
           ),
         ),
       ],
@@ -159,48 +187,50 @@ class _MemberStat extends StatelessWidget {
   }
 }
 
-/// MEMBER CARD
 class _MemberCard extends StatelessWidget {
   final String name;
   final String role;
-  final int totalMeals;
+  final int meals;
   final double balance;
   final bool isActive;
 
   const _MemberCard({
     required this.name,
     required this.role,
-    required this.totalMeals,
+    required this.meals,
     required this.balance,
     required this.isActive,
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool owes = balance < 0;
-    final Color balanceColor = owes ? AppColors.error : AppColors.success;
-
     return ModernCard(
       margin: const EdgeInsets.only(bottom: AppStyles.spaceMedium),
       padding: const EdgeInsets.all(AppStyles.spaceMedium),
-      color: isActive
-          ? AppColors.cardBackground
-          : AppColors.textSecondary.withOpacity(0.05),
       child: Row(
         children: [
           /// AVATAR
           Container(
-            width: 48,
-            height: 48,
+            width: 56,
+            height: 56,
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.blue.withOpacity(0.8),
+                  AppColors.blue,
+                ],
+              ),
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
                 name[0].toUpperCase(),
-                style: AppStyles.heading3.copyWith(
-                  color: AppColors.primary,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -215,66 +245,85 @@ class _MemberCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      name,
-                      style: AppStyles.bodyMedium.copyWith(
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: Text(
+                        name,
+                        style: AppStyles.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: AppStyles.spaceSmall),
-                    if (role == 'Manager')
+                    if (!isActive)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
+                          horizontal: 8,
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius:
-                          BorderRadius.circular(AppStyles.radiusSmall),
+                          color: AppColors.textSecondary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          'Manager',
-                          style: AppStyles.caption.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
+                          'Inactive',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textSecondary,
                           ),
                         ),
                       ),
                   ],
                 ),
-                const SizedBox(height: AppStyles.spaceXSmall),
+                const SizedBox(height: 2),
                 Text(
-                  '$totalMeals meals',
+                  role,
                   style: AppStyles.caption.copyWith(
                     color: AppColors.textSecondary,
                   ),
                 ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.restaurant_menu_outlined,
+                      size: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$meals meals',
+                      style: AppStyles.caption.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
+
+          const SizedBox(width: AppStyles.spaceSmall),
 
           /// BALANCE
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                balance == 0
-                    ? 'Settled'
-                    : '৳${balance.abs().toStringAsFixed(0)}',
-                style: AppStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: balance == 0 ? AppColors.textSecondary : balanceColor,
+                balance >= 0 ? '+৳${balance.toStringAsFixed(0)}' : '৳${balance.toStringAsFixed(0)}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w900,
+                  color: balance >= 0 ? AppColors.success : AppColors.error,
+                  height: 1,
                 ),
               ),
-              const SizedBox(height: AppStyles.spaceXSmall),
-              if (balance != 0)
-                Text(
-                  owes ? 'Owes' : 'Advance',
-                  style: AppStyles.caption.copyWith(
-                    color: balanceColor,
-                  ),
+              const SizedBox(height: 4),
+              Text(
+                balance >= 0 ? 'To receive' : 'To pay',
+                style: AppStyles.caption.copyWith(
+                  color: AppColors.textSecondary,
                 ),
+              ),
             ],
           ),
         ],

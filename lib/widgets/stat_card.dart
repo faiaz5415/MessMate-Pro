@@ -7,6 +7,7 @@ class StatCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final String? subtitle;
 
   const StatCard({
     super.key,
@@ -14,40 +15,62 @@ class StatCard extends StatelessWidget {
     required this.value,
     required this.icon,
     required this.color,
+    this.subtitle,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(AppStyles.spaceLarge),
-      decoration: AppStyles.coloredCardDecoration(color),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.all(AppStyles.spaceMedium),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
+        border: Border.all(
+          color: color.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                title,
-                style: AppStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w500,
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ),
-              const SizedBox(height: AppStyles.spaceXSmall),
-              Text(
-                value,
-                style: AppStyles.heading2.copyWith(color: color),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.all(AppStyles.spaceMedium),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
+          const SizedBox(height: AppStyles.spaceMedium),
+          Text(
+            title,
+            style: AppStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
             ),
-            child: Icon(icon, color: color, size: 32),
           ),
+          const SizedBox(height: AppStyles.spaceSmall),
+          Text(
+            value,
+            style: AppStyles.heading2.copyWith(color: color),
+          ),
+          if (subtitle != null) ...[
+            const SizedBox(height: AppStyles.spaceSmall),
+            Text(
+              subtitle!,
+              style: AppStyles.caption.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
         ],
       ),
     );

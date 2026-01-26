@@ -21,8 +21,28 @@ class _MainShellState extends State<MainShell> {
     MealsScreen(),
     BazarScreen(),
     CostsScreen(),
-    MoreScreen(),
   ];
+
+  void _onTabTapped(int index) {
+    if (index == 4) {
+      // More tab - navigate to full screen without bottom nav
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const MoreScreen(),
+        ),
+      ).then((_) {
+        // When returning from MoreScreen, reset to Dashboard
+        setState(() {
+          _currentIndex = 0;
+        });
+      });
+    } else {
+      // Normal tab navigation
+      setState(() {
+        _currentIndex = index;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +50,7 @@ class _MainShellState extends State<MainShell> {
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNav(
         currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onTap: _onTabTapped,
       ),
     );
   }
