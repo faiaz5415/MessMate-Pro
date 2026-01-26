@@ -1,95 +1,173 @@
 import 'package:flutter/material.dart';
-// import 'package:mess_mate_pro/screens/auth/sign_in_screen.dart'; // এই ইম্পোর্টটি এখন আর প্রয়োজন নেই যদি main.dart এ route ঠিক থাকে
+import '../../utils/app_colors.dart';
+import '../../utils/app_styles.dart';
 
-class SignUpScreen extends StatelessWidget {
+class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign Up'),
-        centerTitle: true,
+        title: const Text('Create Account'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 32),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppStyles.spaceLarge),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: AppStyles.spaceMedium),
 
-            const Text(
-              'Create Account',
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
+              Text(
+                'Join MessMate Pro',
+                style: AppStyles.heading2,
+                textAlign: TextAlign.center,
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: AppStyles.spaceSmall),
 
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Full Name',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              Text(
+                'Create your account to get started',
+                style: AppStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: AppStyles.spaceXLarge),
+
+              /// NAME FIELD
+              TextField(
+                controller: _nameController,
+                textCapitalization: TextCapitalization.words,
+                decoration: AppStyles.inputDecoration(
+                  labelText: 'Full Name',
+                  hintText: 'Enter your full name',
+                  prefixIcon: const Icon(Icons.person_outline),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: AppStyles.spaceMedium),
 
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              /// EMAIL FIELD
+              TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: AppStyles.inputDecoration(
+                  labelText: 'Email',
+                  hintText: 'Enter your email',
+                  prefixIcon: const Icon(Icons.email_outlined),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: AppStyles.spaceMedium),
 
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              /// PASSWORD FIELD
+              TextField(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                decoration: AppStyles.inputDecoration(
+                  labelText: 'Password',
+                  hintText: 'Create a password',
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: AppStyles.spaceMedium),
 
-            TextField(
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: 'Confirm Password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              /// CONFIRM PASSWORD FIELD
+              TextField(
+                controller: _confirmPasswordController,
+                obscureText: _obscureConfirmPassword,
+                decoration: AppStyles.inputDecoration(
+                  labelText: 'Confirm Password',
+                  hintText: 'Re-enter your password',
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscureConfirmPassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureConfirmPassword = !_obscureConfirmPassword;
+                      });
+                    },
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: AppStyles.spaceLarge),
 
-            ElevatedButton(
-              onPressed: () {
-                // "Create Account" button press action
-                // After successful sign up, navigate to the Sign In screen.
-                // Use pushReplacementNamed to replace the current screen.
-                Navigator.pushReplacementNamed(
-                  context,
-                  '/sign-in', // Route name for SignInScreen defined in main.dart
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+              /// SIGN UP BUTTON
+              ElevatedButton(
+                onPressed: () {
+                  // Mock navigation
+                  Navigator.pushReplacementNamed(context, '/profile-setup');
+                },
+                child: const Text('Sign Up'),
               ),
-              child: const Text('Create Account'),
-            ),
-          ],
+
+              const SizedBox(height: AppStyles.spaceLarge),
+
+              /// SIGN IN LINK
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Already have an account? ',
+                    style: AppStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                    ),
+                    child: const Text('Sign In'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

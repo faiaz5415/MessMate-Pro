@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import '../../utils/app_colors.dart';
+import '../../utils/app_styles.dart';
 import 'sign_in_screen.dart';
 
 class ForgotPasswordConfirmationScreen extends StatelessWidget {
@@ -9,44 +10,53 @@ class ForgotPasswordConfirmationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Check Your Email'),
-        centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppStyles.spaceLarge),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 40),
+              const Spacer(),
 
-              const Icon(
-                Icons.mark_email_read_outlined,
-                size: 80,
-                color: Colors.green,
-              ),
-
-              const SizedBox(height: 24),
-
-              const Text(
-                'Password Reset Link Sent',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+              /// SUCCESS ICON
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(AppStyles.spaceLarge),
+                  decoration: BoxDecoration(
+                    color: AppColors.success.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.mark_email_read_outlined,
+                    size: 64,
+                    color: AppColors.success,
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppStyles.spaceLarge),
 
-              const Text(
-                'We’ve sent a password reset link to your email address.\nPlease check your inbox and follow the instructions.',
+              Text(
+                'Check Your Email',
+                style: AppStyles.heading2,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey),
+              ),
+
+              const SizedBox(height: AppStyles.spaceMedium),
+
+              Text(
+                'We\'ve sent a password reset link to your email. Please check your inbox and follow the instructions.',
+                style: AppStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
               ),
 
               const Spacer(),
 
+              /// BACK TO SIGN IN
               ElevatedButton(
                 onPressed: () {
                   Navigator.pushAndRemoveUntil(
@@ -57,14 +67,10 @@ class ForgotPasswordConfirmationScreen extends StatelessWidget {
                         (route) => false,
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 24,
-                  ),
-                ),
                 child: const Text('Back to Sign In'),
               ),
+
+              const SizedBox(height: AppStyles.spaceMedium),
             ],
           ),
         ),

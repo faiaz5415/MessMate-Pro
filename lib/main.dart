@@ -6,6 +6,7 @@ import 'screens/auth/splash_screen.dart';
 import 'screens/auth/sign_in_screen.dart';
 import 'screens/auth/sign_up_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
+import 'screens/onboarding/intro_screen.dart';
 import 'screens/onboarding/profile_setup_screen.dart';
 import 'screens/onboarding/dining_select_screen.dart';
 import 'screens/onboarding/join_status_screen.dart';
@@ -54,14 +55,14 @@ class MessMateApp extends StatelessWidget {
           ),
 
           // Card Theme
-        cardTheme: CardThemeData(
-          color: AppColors.cardBackground,
-          elevation: 1,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+          cardTheme: CardThemeData(
+            color: AppColors.cardBackground,
+            elevation: 1,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            margin: EdgeInsets.zero,
           ),
-          margin: EdgeInsets.zero,
-        ),
 
           // Input Decoration Theme
           inputDecorationTheme: InputDecorationTheme(
@@ -154,6 +155,7 @@ class MessMateApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => const SplashScreen(),
+          '/intro': (context) => const IntroScreen(),
           '/sign-in': (context) => const SignInScreen(),
           '/sign-up': (context) => const SignUpScreen(),
           '/forgot-password': (context) => const ForgotPasswordScreen(),

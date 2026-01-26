@@ -1,101 +1,161 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
+import '../../utils/app_styles.dart';
+import '../../widgets/modern_card.dart';
 
 class CostsScreen extends StatelessWidget {
   const CostsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    /// ---------------- MOCK DATA ----------------
+    final bool youHaveToPay = true;
+    final double balanceAmount = 350;
+
+    final List<Map<String, dynamic>> deposits = [
+      {'date': '20 Jan 2026', 'amount': 500.0},
+      {'date': '10 Jan 2026', 'amount': 1000.0},
+      {'date': '1 Jan 2026', 'amount': 800.0},
+    ];
+
+    final double totalDeposit = deposits.fold(
+      0,
+          (sum, item) => sum + (item['amount'] as double),
+    );
+
+    /// -------------------------------------------
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Costs'),
-        centerTitle: true,
+        title: const Text('Costs & Deposits'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(AppStyles.spaceMedium),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _BalanceCard(
-              title: 'You Will Pay',
-              amount: 350,
-              color: Colors.red,
-            ),
-
-            const SizedBox(height: 16),
-
-            const Text(
-              'Deposit History',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            /// BALANCE STATUS CARD
+            Container(
+              padding: const EdgeInsets.all(AppStyles.spaceLarge),
+              decoration: AppStyles.coloredCardDecoration(
+                youHaveToPay ? AppColors.error : AppColors.success,
               ),
-            ),
-
-            const SizedBox(height: 12),
-
-            Expanded(
-              child: ListView(
-                children: const [
-                  _DepositItem(
-                    date: '10 Jan 2026',
-                    amount: 1000,
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(AppStyles.spaceMedium),
+                    decoration: BoxDecoration(
+                      color: (youHaveToPay
+                          ? AppColors.error
+                          : AppColors.success)
+                          .withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      youHaveToPay
+                          ? Icons.arrow_upward
+                          : Icons.arrow_downward,
+                      color:
+                      youHaveToPay ? AppColors.error : AppColors.success,
+                      size: 28,
+                    ),
                   ),
-                  _DepositItem(
-                    date: '20 Jan 2026',
-                    amount: 500,
+                  const SizedBox(height: AppStyles.spaceMedium),
+                  Text(
+                    youHaveToPay ? 'You Have To Pay' : 'You Will Receive',
+                    style: AppStyles.bodyMedium.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: AppStyles.spaceSmall),
+                  Text(
+                    '৳${balanceAmount.toStringAsFixed(0)}',
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color:
+                      youHaveToPay ? AppColors.error : AppColors.success,
+                    ),
                   ),
                 ],
               ),
             ),
+
+            const SizedBox(height: AppStyles.spaceLarge),
+
+            /// TOTAL DEPOSIT CARD
+            ModernCard(
+              padding: const EdgeInsets.all(AppStyles.spaceMedium),
+              color: AppColors.blue.withOpacity(0.05),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(AppStyles.spaceSmall),
+                        decoration: BoxDecoration(
+                          color: AppColors.blue.withOpacity(0.1),
+                          borderRadius:
+                          BorderRadius.circular(AppStyles.radiusSmall),
+                        ),
+                        child: Icon(
+                          Icons.account_balance_wallet_outlined,
+                          color: AppColors.blue,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: AppStyles.spaceMedium),
+                      Text(
+                        'Total Deposit',
+                        style: AppStyles.bodyMedium.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    '৳${totalDeposit.toStringAsFixed(0)}',
+                    style: AppStyles.heading3.copyWith(
+                      color: AppColors.blue,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: AppStyles.spaceLarge),
+
+            /// SECTION TITLE
+            Text(
+              'Deposit History',
+              style: AppStyles.heading3,
+            ),
+
+            const SizedBox(height: AppStyles.spaceMedium),
+
+            /// DEPOSIT LIST
+            ...deposits.map((deposit) {
+              return _DepositItem(
+                date: deposit['date'],
+                amount: deposit['amount'],
+              );
+            }),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Add deposit
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Add Deposit'),
       ),
     );
   }
 }
 
-class _BalanceCard extends StatelessWidget {
-  final String title;
-  final double amount;
-  final Color color;
-
-  const _BalanceCard({
-    required this.title,
-    required this.amount,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 2,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '৳ ${amount.toStringAsFixed(0)}',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
+/// DEPOSIT ITEM
 class _DepositItem extends StatelessWidget {
   final String date;
   final double amount;
@@ -107,12 +167,53 @@ class _DepositItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: ListTile(
-        leading: const Icon(Icons.payments),
-        title: Text('৳ ${amount.toStringAsFixed(0)}'),
-        subtitle: Text(date),
+    return ModernCard(
+      margin: const EdgeInsets.only(bottom: AppStyles.spaceSmall),
+      padding: const EdgeInsets.all(AppStyles.spaceMedium),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppStyles.spaceSmall),
+            decoration: BoxDecoration(
+              color: AppColors.success.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(AppStyles.radiusSmall),
+            ),
+            child: Icon(
+              Icons.payments_outlined,
+              color: AppColors.success,
+              size: 20,
+            ),
+          ),
+
+          const SizedBox(width: AppStyles.spaceMedium),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '৳${amount.toStringAsFixed(0)}',
+                  style: AppStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: AppStyles.spaceXSmall),
+                Text(
+                  date,
+                  style: AppStyles.caption.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Icon(
+            Icons.check_circle,
+            color: AppColors.success,
+            size: 20,
+          ),
+        ],
       ),
     );
   }

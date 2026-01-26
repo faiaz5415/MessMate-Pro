@@ -1,207 +1,226 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import '../../utils/app_colors.dart';
+import '../../utils/app_styles.dart';
+import '../../widgets/modern_card.dart';
 
-class MealsScreen extends StatefulWidget {
+class MealsScreen extends StatelessWidget {
   const MealsScreen({super.key});
 
   @override
-  State<MealsScreen> createState() => _MealsScreenState();
-}
-
-class _MealsScreenState extends State<MealsScreen> {
-  final DateTime selectedMonth = DateTime.now();
-
-  // 🔴 later Provider/Firebase থেকে আসবে
-  final bool isManager = true; // false হলে member
-
-  bool _isLocked(DateTime date) {
-    final today = DateTime.now();
-    return date.isBefore(DateTime(today.year, today.month, today.day));
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final daysInMonth = DateUtils.getDaysInMonth(
-      selectedMonth.year,
-      selectedMonth.month,
+    /// ---------------- MOCK DATA ----------------
+    final List<Map<String, dynamic>> mealHistory = [
+      {'date': '20 Jan 2026', 'breakfast': 1, 'lunch': 1, 'dinner': 0},
+      {'date': '19 Jan 2026', 'breakfast': 1, 'lunch': 1, 'dinner': 1},
+      {'date': '18 Jan 2026', 'breakfast': 0, 'lunch': 1, 'dinner': 1},
+      {'date': '17 Jan 2026', 'breakfast': 1, 'lunch': 0, 'dinner': 1},
+      {'date': '16 Jan 2026', 'breakfast': 1, 'lunch': 1, 'dinner': 1},
+    ];
+
+    final int totalMeals = mealHistory.fold(
+      0,
+          (sum, day) =>
+      sum +
+          (day['breakfast'] as int) +
+          (day['lunch'] as int) +
+          (day['dinner'] as int),
     );
+
+    /// -------------------------------------------
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(DateFormat('MMMM yyyy').format(selectedMonth)),
-        centerTitle: true,
+        title: const Text('Your Meals'),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: daysInMonth,
-        itemBuilder: (context, index) {
-          final date = DateTime(
-            selectedMonth.year,
-            selectedMonth.month,
-            index + 1,
-          );
+      body: Column(
+        children: [
+          /// TOTAL MEALS CARD
+          Container(
+            margin: const EdgeInsets.all(AppStyles.spaceMedium),
+            padding: const EdgeInsets.all(AppStyles.spaceLarge),
+            decoration: AppStyles.coloredCardDecoration(AppColors.blue),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Total Meals',
+                      style: AppStyles.bodyMedium.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: AppStyles.spaceXSmall),
+                    Text(
+                      totalMeals.toString(),
+                      style: AppStyles.heading1.copyWith(
+                        color: AppColors.blue,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.all(AppStyles.spaceMedium),
+                  decoration: BoxDecoration(
+                    color: AppColors.blue.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
+                  ),
+                  child: Icon(
+                    Icons.restaurant_menu,
+                    color: AppColors.blue,
+                    size: 32,
+                  ),
+                ),
+              ],
+            ),
+          ),
 
-          return MealDayCard(
-            date: date,
-            locked: _isLocked(date),
-            isManager: isManager,
-          );
+          /// MEAL HISTORY
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.fromLTRB(
+                AppStyles.spaceMedium,
+                0,
+                AppStyles.spaceMedium,
+                AppStyles.spaceMedium,
+              ),
+              itemCount: mealHistory.length,
+              itemBuilder: (context, index) {
+                final day = mealHistory[index];
+                return _MealDayCard(
+                  date: day['date'],
+                  breakfast: day['breakfast'],
+                  lunch: day['lunch'],
+                  dinner: day['dinner'],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          // Add meal entry
         },
+        icon: const Icon(Icons.add),
+        label: const Text('Add Meals'),
       ),
     );
   }
 }
 
-/// ----------------------------------------------------------------
 /// MEAL DAY CARD
-/// ----------------------------------------------------------------
-class MealDayCard extends StatefulWidget {
-  final DateTime date;
-  final bool locked;
-  final bool isManager;
+class _MealDayCard extends StatelessWidget {
+  final String date;
+  final int breakfast;
+  final int lunch;
+  final int dinner;
 
-  const MealDayCard({
-    super.key,
+  const _MealDayCard({
     required this.date,
-    required this.locked,
-    required this.isManager,
+    required this.breakfast,
+    required this.lunch,
+    required this.dinner,
   });
 
   @override
-  State<MealDayCard> createState() => _MealDayCardState();
-}
-
-class _MealDayCardState extends State<MealDayCard> {
-  bool dayOn = true;
-  bool nightOn = true;
-
-  double dayQty = 1;
-  double nightQty = 1;
-
-  bool get canEdit {
-    if (!widget.locked) return true;
-    return widget.isManager;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+    final int total = breakfast + lunch + dinner;
 
-            /// Date Header + Lock/Admin Icon
-            Row(
-              children: [
-                Text(
-                  DateFormat('dd MMMM, EEEE').format(widget.date),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
+    return ModernCard(
+      margin: const EdgeInsets.only(bottom: AppStyles.spaceMedium),
+      padding: const EdgeInsets.all(AppStyles.spaceMedium),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                date,
+                style: AppStyles.bodyMedium.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
-                const Spacer(),
-                if (widget.locked && !widget.isManager)
-                  const Icon(Icons.lock, color: Colors.red),
-                if (widget.locked && widget.isManager)
-                  const Icon(Icons.admin_panel_settings,
-                      color: Colors.orange),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            /// DAY MEAL
-            _mealRow(
-              title: 'Day Meal',
-              isOn: dayOn,
-              quantity: dayQty,
-              enabled: canEdit,
-              onToggle: (v) => setState(() => dayOn = v),
-              onQtyChanged: (v) => setState(() => dayQty = v!),
-            ),
-
-            const SizedBox(height: 12),
-
-            /// NIGHT MEAL
-            _mealRow(
-              title: 'Night Meal',
-              isOn: nightOn,
-              quantity: nightQty,
-              enabled: canEdit,
-              onToggle: (v) => setState(() => nightOn = v),
-              onQtyChanged: (v) => setState(() => nightQty = v!),
-            ),
-
-            /// Manager Override Indicator
-            if (widget.locked && widget.isManager) ...[
-              const SizedBox(height: 12),
-              const Text(
-                'Manager Override Enabled',
-                style: TextStyle(
-                  color: Colors.orange,
-                  fontSize: 12,
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppStyles.spaceSmall,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(AppStyles.radiusSmall),
+                ),
+                child: Text(
+                  '$total meals',
+                  style: AppStyles.caption.copyWith(
+                    color: AppColors.blue,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
             ],
-          ],
-        ),
+          ),
+
+          const SizedBox(height: AppStyles.spaceMedium),
+
+          Row(
+            children: [
+              _MealIndicator(
+                label: 'Breakfast',
+                count: breakfast,
+                icon: Icons.breakfast_dining_outlined,
+              ),
+              const SizedBox(width: AppStyles.spaceMedium),
+              _MealIndicator(
+                label: 'Lunch',
+                count: lunch,
+                icon: Icons.lunch_dining_outlined,
+              ),
+              const SizedBox(width: AppStyles.spaceMedium),
+              _MealIndicator(
+                label: 'Dinner',
+                count: dinner,
+                icon: Icons.dinner_dining_outlined,
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
+}
 
-  /// ----------------------------------------------------------------
-  /// SINGLE MEAL ROW (Day / Night)
-  /// ----------------------------------------------------------------
-  Widget _mealRow({
-    required String title,
-    required bool isOn,
-    required double quantity,
-    required bool enabled,
-    required Function(bool) onToggle,
-    required ValueChanged<double?> onQtyChanged,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+class _MealIndicator extends StatelessWidget {
+  final String label;
+  final int count;
+  final IconData icon;
+
+  const _MealIndicator({
+    required this.label,
+    required this.count,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool hasMeal = count > 0;
+
+    return Row(
       children: [
-        Row(
-          children: [
-            Text(title),
-            const Spacer(),
-            Switch(
-              value: isOn,
-              onChanged: enabled ? onToggle : null,
-            ),
-          ],
+        Icon(
+          icon,
+          size: 16,
+          color: hasMeal ? AppColors.success : AppColors.textSecondary,
         ),
-        if (isOn)
-          Row(
-            children: [
-              const Text('Qty'),
-              const SizedBox(width: 12),
-              DropdownButton<double>(
-                value: quantity,
-                items: const [
-                  DropdownMenuItem(value: 0.5, child: Text('0.5')),
-                  DropdownMenuItem(value: 1, child: Text('1')),
-                  DropdownMenuItem(value: 2, child: Text('2')),
-                  DropdownMenuItem(value: 3, child: Text('3')),
-                  DropdownMenuItem(value: 4, child: Text('4')),
-                ],
-                onChanged: enabled
-                    ? (value) {
-                  if (value != null) {
-                    onQtyChanged(value);
-                  }
-                }
-                    : null,
-              ),
-            ],
-
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: AppStyles.caption.copyWith(
+            color: hasMeal ? AppColors.textPrimary : AppColors.textSecondary,
           ),
+        ),
       ],
     );
   }

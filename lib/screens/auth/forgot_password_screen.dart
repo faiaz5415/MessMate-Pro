@@ -1,67 +1,103 @@
 import 'package:flutter/material.dart';
-
+import '../../utils/app_colors.dart';
+import '../../utils/app_styles.dart';
 import 'forgot_password_confirmation_screen.dart';
 
-class ForgotPasswordScreen extends StatelessWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
+
+  @override
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  final _emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Forgot Password'),
-        centerTitle: true,
+        title: const Text('Reset Password'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const SizedBox(height: 32),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppStyles.spaceLarge),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: AppStyles.spaceXLarge),
 
-            const Text(
-              'Reset Password',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            const Text(
-              'Enter your email and we’ll send you a reset link.',
-              style: TextStyle(color: Colors.grey),
-            ),
-
-            const SizedBox(height: 24),
-
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+              /// ICON
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(AppStyles.spaceLarge),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.lock_reset,
+                    size: 48,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: AppStyles.spaceLarge),
 
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ForgotPasswordConfirmationScreen(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
+              Text(
+                'Forgot Password?',
+                style: AppStyles.heading2,
+                textAlign: TextAlign.center,
               ),
-              child: const Text('Send Reset Link'),
-            ),
-          ],
+
+              const SizedBox(height: AppStyles.spaceSmall),
+
+              Text(
+                'Enter your email and we\'ll send you a password reset link',
+                style: AppStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: AppStyles.spaceXLarge),
+
+              /// EMAIL FIELD
+              TextField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: AppStyles.inputDecoration(
+                  labelText: 'Email',
+                  hintText: 'Enter your registered email',
+                  prefixIcon: const Icon(Icons.email_outlined),
+                ),
+              ),
+
+              const SizedBox(height: AppStyles.spaceLarge),
+
+              /// SEND BUTTON
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ForgotPasswordConfirmationScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Send Reset Link'),
+              ),
+
+              const Spacer(),
+            ],
+          ),
         ),
       ),
     );

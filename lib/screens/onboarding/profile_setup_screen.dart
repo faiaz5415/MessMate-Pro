@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-
+import '../../utils/app_colors.dart';
+import '../../utils/app_styles.dart';
+import '../../widgets/modern_card.dart';
 import 'role_selection_screen.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
@@ -13,35 +12,13 @@ class ProfileSetupScreen extends StatefulWidget {
 }
 
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
-  File? _profileImage;
-
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
-
-  String? _profession; // 🔹 dropdown value
-
-  final ImagePicker _picker = ImagePicker();
-
-  Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 70,
-    );
-
-    if (image != null) {
-      setState(() {
-        _profileImage = File(image.path);
-      });
-    }
-  }
 
   @override
   void dispose() {
-    // ✅ Controllers dispose (IMPORTANT)
     _nameController.dispose();
     _phoneController.dispose();
-    _addressController.dispose();
     super.dispose();
   }
 
@@ -49,130 +26,143 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Set Up Profile'),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
+        title: const Text('Setup Profile'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(AppStyles.spaceLarge),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 24),
+              /// PROGRESS INDICATOR
+              _StepIndicator(currentStep: 1, totalSteps: 3),
 
-              /// Profile Image Picker
+              const SizedBox(height: AppStyles.spaceXLarge),
+
+              /// ICON
               Center(
-                child: GestureDetector(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Colors.grey.shade300,
-                    backgroundImage:
-                    _profileImage != null ? FileImage(_profileImage!) : null,
-                    child: _profileImage == null
-                        ? const Icon(Icons.camera_alt, size: 32)
-                        : null,
+                child: Container(
+                  padding: const EdgeInsets.all(AppStyles.spaceLarge),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.person_outline,
+                    size: 48,
+                    color: AppColors.primary,
                   ),
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppStyles.spaceLarge),
 
-              const Center(
-                child: Text(
-                  'Tap to select profile picture',
-                  style: TextStyle(color: Colors.grey),
-                ),
+              Text(
+                'Tell Us About You',
+                style: AppStyles.heading2,
+                textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: AppStyles.spaceSmall),
 
-              /// Full Name
+              Text(
+                'We need a few details to personalize your experience',
+                style: AppStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: AppStyles.spaceXLarge),
+
+              /// NAME FIELD
               TextField(
                 controller: _nameController,
-                decoration: InputDecoration(
+                textCapitalization: TextCapitalization.words,
+                decoration: AppStyles.inputDecoration(
                   labelText: 'Full Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  hintText: 'Enter your full name',
+                  prefixIcon: const Icon(Icons.person_outline),
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppStyles.spaceMedium),
 
-              /// Phone Number
+              /// PHONE FIELD
               TextField(
                 controller: _phoneController,
                 keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
+                decoration: AppStyles.inputDecoration(
                   labelText: 'Phone Number',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  hintText: 'Enter your phone number',
+                  prefixIcon: const Icon(Icons.phone_outlined),
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppStyles.spaceXLarge),
 
-              /// Address
-              TextField(
-                controller: _addressController,
-                decoration: InputDecoration(
-                  labelText: 'Address (optional)',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              /// Profession Dropdown
-              DropdownButtonFormField<String>(
-                value: _profession, // ✅ FIX
-                decoration: InputDecoration(
-                  labelText: 'Profession',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                items: const [
-                  DropdownMenuItem(value: 'Student', child: Text('Student')),
-                  DropdownMenuItem(value: 'Job', child: Text('Job')),
-                  DropdownMenuItem(value: 'Other', child: Text('Other')),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _profession = value;
-                  });
-                },
-              ),
-
-              const SizedBox(height: 32),
-
-              /// Continue Button
+              /// CONTINUE BUTTON
               ElevatedButton(
                 onPressed: () {
-                  // Later: validation + Provider + Firebase save
-                  // Now: mock navigation
-
-                  Navigator.pushReplacement(
+                  Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => const RoleSelectionScreen(),
                     ),
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
                 child: const Text('Continue'),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// STEP INDICATOR WIDGET
+class _StepIndicator extends StatelessWidget {
+  final int currentStep;
+  final int totalSteps;
+
+  const _StepIndicator({
+    required this.currentStep,
+    required this.totalSteps,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          'Step $currentStep of $totalSteps',
+          style: AppStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: AppStyles.spaceSmall),
+        Row(
+          children: List.generate(
+            totalSteps,
+                (index) => Expanded(
+              child: Container(
+                height: 4,
+                margin: EdgeInsets.only(
+                  right: index < totalSteps - 1 ? AppStyles.spaceSmall : 0,
+                ),
+                decoration: BoxDecoration(
+                  color: index < currentStep
+                      ? AppColors.primary
+                      : AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

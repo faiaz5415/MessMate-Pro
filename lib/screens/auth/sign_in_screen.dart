@@ -1,113 +1,152 @@
 import 'package:flutter/material.dart';
-import 'forgot_password_screen.dart'; // নিশ্চিত করুন যে এই ফাইলটি বিদ্যমান
-import 'sign_up_screen.dart'; // নিশ্চিত করুন যে এই ফাইলটি বিদ্যমান
-import '../onboarding/profile_setup_screen.dart'; // login এর পর এখানেই যাবে
+import '../../utils/app_colors.dart';
+import '../../utils/app_styles.dart';
 
-class SignInScreen extends StatelessWidget {
+class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
+
+  @override
+  State<SignInScreen> createState() => _SignInScreenState();
+}
+
+class _SignInScreenState extends State<SignInScreen> {
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign In'),
-        centerTitle: true,
-      ),
-      body: SafeArea( // SafeArea ব্যবহার করা হয়েছে overflow রোধের জন্য
-        child: SingleChildScrollView( // SingleChildScrollView ব্যবহার করা হয়েছে overflow রোধের জন্য
-          padding: const EdgeInsets.all(20),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppStyles.spaceLarge),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: AppStyles.spaceXLarge),
 
-              const Text(
-                'Welcome Back 👋',
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
+              /// LOGO & TITLE
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(AppStyles.spaceMedium),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
+                  ),
+                  child: Icon(
+                    Icons.restaurant_menu,
+                    size: 48,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: AppStyles.spaceLarge),
 
-              const Text(
+              Text(
+                'Welcome Back',
+                style: AppStyles.heading1,
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: AppStyles.spaceSmall),
+
+              Text(
                 'Sign in to continue',
-                style: TextStyle(color: Colors.grey),
+                style: AppStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: AppStyles.spaceXLarge),
 
-              /// Email
+              /// EMAIL FIELD
               TextField(
+                controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
+                decoration: AppStyles.inputDecoration(
                   labelText: 'Email',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  hintText: 'Enter your email',
+                  prefixIcon: const Icon(Icons.email_outlined),
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppStyles.spaceMedium),
 
-              /// Password
+              /// PASSWORD FIELD
               TextField(
-                obscureText: true,
-                decoration: InputDecoration(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                decoration: AppStyles.inputDecoration(
                   labelText: 'Password',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                  hintText: 'Enter your password',
+                  prefixIcon: const Icon(Icons.lock_outline),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
+                    },
                   ),
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppStyles.spaceSmall),
 
-              /// Sign In button
+              /// FORGOT PASSWORD
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/forgot-password');
+                  },
+                  child: const Text('Forgot Password?'),
+                ),
+              ),
+
+              const SizedBox(height: AppStyles.spaceMedium),
+
+              /// SIGN IN BUTTON
               ElevatedButton(
                 onPressed: () {
-                  // Sign In button press action
-                  Navigator.pushReplacementNamed( // Use pushReplacementNamed
-                    context,
-                    '/profile-setup', // Route defined in main.dart
-                  );
+                  // Mock navigation
+                  Navigator.pushReplacementNamed(context, '/profile-setup');
                 },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
                 child: const Text('Sign In'),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: AppStyles.spaceLarge),
 
-              /// Forgot Password
-              TextButton(
-                onPressed: () {
-                  // Forgot Password button press action
-                  Navigator.pushReplacementNamed( // Use pushReplacementNamed
-                    context,
-                    '/forgot-password', // Route defined in main.dart
-                  );
-                },
-                child: const Text('Forgot Password?'),
-              ),
-
-              const SizedBox(height: 40),
-
-              /// Sign Up section
+              /// SIGN UP LINK
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Don't have an account? "),
+                  Text(
+                    'Don\'t have an account? ',
+                    style: AppStyles.bodyMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
                   TextButton(
                     onPressed: () {
-                      // Sign Up button press action
-                      Navigator.pushReplacementNamed( // Use pushReplacementNamed
-                        context,
-                        '/sign-up', // Route defined in main.dart
-                      );
+                      Navigator.pushNamed(context, '/sign-up');
                     },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                    ),
                     child: const Text('Sign Up'),
                   ),
                 ],

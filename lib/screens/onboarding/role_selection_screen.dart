@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-
+import '../../utils/app_colors.dart';
+import '../../utils/app_styles.dart';
+import '../../widgets/modern_card.dart';
 import 'dining_select_screen.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
@@ -10,111 +12,189 @@ class RoleSelectionScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Choose Your Role'),
-        centerTitle: true,
-        automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            const SizedBox(height: 24),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppStyles.spaceLarge),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              /// PROGRESS INDICATOR
+              _StepIndicator(currentStep: 2, totalSteps: 3),
 
-            /// Mess Manager
-            _RoleCard(
-              icon: Icons.admin_panel_settings,
-              title: 'Mess Manager',
-              subtitle: 'Manages meals, bazar and costs',
-              onTap: () {
-                // Later: save role = manager in Provider
+              const Spacer(),
 
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const DiningSelectScreen(
-                      isManager: true,
+              /// TITLE
+              Text(
+                'How Will You Use\nMessMate Pro?',
+                style: AppStyles.heading2,
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: AppStyles.spaceSmall),
+
+              Text(
+                'Select your role to continue',
+                style: AppStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+
+              const SizedBox(height: AppStyles.spaceXLarge),
+
+              /// ROLE CARDS
+              _RoleCard(
+                title: 'Manager',
+                description: 'Create and manage a dining mess',
+                icon: Icons.admin_panel_settings_outlined,
+                color: AppColors.primary,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DiningSelectScreen(isManager: true),
                     ),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: AppStyles.spaceMedium),
 
-            /// Mess Member
-            _RoleCard(
-              icon: Icons.people,
-              title: 'Mess Member',
-              subtitle: 'Logs meals and views costs',
-              onTap: () {
-                // Later: save role = member in Provider
-
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const DiningSelectScreen(
-                      isManager: false,
+              _RoleCard(
+                title: 'Member',
+                description: 'Join an existing dining mess',
+                icon: Icons.person_add_outlined,
+                color: AppColors.blue,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const DiningSelectScreen(isManager: false),
                     ),
-                  ),
-                );
-              },
-            ),
-          ],
+                  );
+                },
+              ),
+
+              const Spacer(),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+/// ROLE CARD WIDGET
 class _RoleCard extends StatelessWidget {
-  final IconData icon;
   final String title;
-  final String subtitle;
+  final String description;
+  final IconData icon;
+  final Color color;
   final VoidCallback onTap;
 
   const _RoleCard({
-    required this.icon,
     required this.title,
-    required this.subtitle,
+    required this.description,
+    required this.icon,
+    required this.color,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return ModernCard(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(12),
+      padding: const EdgeInsets.all(AppStyles.spaceLarge),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(AppStyles.spaceMedium),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
+            ),
+            child: Icon(
+              icon,
+              size: 32,
+              color: color,
+            ),
+          ),
+
+          const SizedBox(width: AppStyles.spaceMedium),
+
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: AppStyles.heading3,
+                ),
+                const SizedBox(height: AppStyles.spaceXSmall),
+                Text(
+                  description,
+                  style: AppStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          Icon(
+            Icons.arrow_forward_ios,
+            size: 16,
+            color: AppColors.textSecondary,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// STEP INDICATOR WIDGET
+class _StepIndicator extends StatelessWidget {
+  final int currentStep;
+  final int totalSteps;
+
+  const _StepIndicator({
+    required this.currentStep,
+    required this.totalSteps,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          'Step $currentStep of $totalSteps',
+          style: AppStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        child: Row(
-          children: [
-            Icon(icon, size: 36),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-                ],
+        const SizedBox(height: AppStyles.spaceSmall),
+        Row(
+          children: List.generate(
+            totalSteps,
+                (index) => Expanded(
+              child: Container(
+                height: 4,
+                margin: EdgeInsets.only(
+                  right: index < totalSteps - 1 ? AppStyles.spaceSmall : 0,
+                ),
+                decoration: BoxDecoration(
+                  color: index < currentStep
+                      ? AppColors.primary
+                      : AppColors.border,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
             ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }

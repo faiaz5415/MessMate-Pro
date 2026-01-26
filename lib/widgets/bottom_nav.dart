@@ -18,26 +18,27 @@ class BottomNav extends StatelessWidget {
       type: BottomNavigationBarType.fixed,
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: Icon(Icons.home_outlined),  // ✅ Changed
           label: 'Home',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.restaurant),
+          icon: Icon(Icons.restaurant_menu_outlined),  // ✅ Already correct
           label: 'Meals',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_cart),
+          icon: Icon(Icons.shopping_bag_outlined),  // ✅ Changed
           label: 'Bazar',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.attach_money),
+          icon: Icon(Icons.payments_outlined),  // ✅ Changed
           label: 'Costs',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.more_horiz),
+          icon: Icon(Icons.more_horiz_outlined),  // ✅ Changed
           label: 'More',
         ),
       ],
+
     );
   }
 }

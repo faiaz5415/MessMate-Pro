@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../utils/app_colors.dart';
+import '../../utils/app_styles.dart';
+import '../../widgets/modern_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -21,11 +24,17 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Dashboard'),
-        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppStyles.spaceMedium),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             /// PAY / RECEIVE CARD
             _BalanceStatusCard(
@@ -33,39 +42,48 @@ class DashboardScreen extends StatelessWidget {
               amount: balanceAmount,
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppStyles.spaceLarge),
+
+            /// Section Title
+            Text(
+              'Month Overview',
+              style: AppStyles.heading3,
+            ),
+
+            const SizedBox(height: AppStyles.spaceMedium),
 
             /// SUMMARY GRID
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+              crossAxisSpacing: AppStyles.spaceMedium,
+              mainAxisSpacing: AppStyles.spaceMedium,
+              childAspectRatio: 1.1,
               children: [
-                _ModernInfoCard(
+                _MetricCard(
                   title: 'Total Meals',
                   value: totalMeals.toString(),
-                  icon: Icons.restaurant,
-                  color: Colors.orange,
+                  icon: Icons.restaurant_menu,
+                  color: AppColors.orange,
                 ),
-                _ModernInfoCard(
+                _MetricCard(
                   title: 'Meal Rate',
-                  value: '৳ $mealRate',
-                  icon: Icons.calculate,
-                  color: Colors.blue,
+                  value: '৳$mealRate',
+                  icon: Icons.attach_money,
+                  color: AppColors.blue,
                 ),
-                _ModernInfoCard(
+                _MetricCard(
                   title: 'Your Cost',
-                  value: '৳ $yourCost',
-                  icon: Icons.person,
-                  color: Colors.purple,
+                  value: '৳$yourCost',
+                  icon: Icons.person_outline,
+                  color: AppColors.purple,
                 ),
-                _ModernInfoCard(
-                  title: 'Total Mess Cost',
-                  value: '৳ $totalMessCost',
-                  icon: Icons.groups,
-                  color: Colors.teal,
+                _MetricCard(
+                  title: 'Total Cost',
+                  value: '৳$totalMessCost',
+                  icon: Icons.account_balance_wallet_outlined,
+                  color: AppColors.teal,
                 ),
               ],
             ),
@@ -90,33 +108,44 @@ class _BalanceStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color color = isPay ? Colors.red : Colors.green;
+    final Color statusColor = isPay ? AppColors.error : AppColors.success;
+    final IconData statusIcon = isPay ? Icons.arrow_upward : Icons.arrow_downward;
+    final String statusText = isPay ? 'You Have To Pay' : 'You Will Receive';
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.4)),
-      ),
+    return ModernCard(
+      padding: const EdgeInsets.all(AppStyles.spaceLarge),
       child: Column(
         children: [
-          Text(
-            isPay ? 'You Have To Pay' : 'You Will Receive',
-            style: TextStyle(
-              fontSize: 16,
-              color: color,
-              fontWeight: FontWeight.w600,
+          Container(
+            padding: const EdgeInsets.all(AppStyles.spaceMedium),
+            decoration: BoxDecoration(
+              color: statusColor.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              statusIcon,
+              color: statusColor,
+              size: 32,
             ),
           ),
-          const SizedBox(height: 8),
+
+          const SizedBox(height: AppStyles.spaceMedium),
+
           Text(
-            '৳ ${amount.toStringAsFixed(0)}',
+            statusText,
+            style: AppStyles.bodyMedium.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+
+          const SizedBox(height: AppStyles.spaceSmall),
+
+          Text(
+            '৳${amount.toStringAsFixed(0)}',
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 36,
               fontWeight: FontWeight.bold,
-              color: color,
+              color: statusColor,
             ),
           ),
         ],
@@ -126,15 +155,15 @@ class _BalanceStatusCard extends StatelessWidget {
 }
 
 /// ------------------------------------------------------------
-/// MODERN INFO CARD
+/// METRIC CARD
 /// ------------------------------------------------------------
-class _ModernInfoCard extends StatelessWidget {
+class _MetricCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
   final Color color;
 
-  const _ModernInfoCard({
+  const _MetricCard({
     required this.title,
     required this.value,
     required this.icon,
@@ -144,29 +173,45 @@ class _ModernInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: color.withOpacity(0.08),
-      ),
+      padding: const EdgeInsets.all(AppStyles.spaceMedium),
+      decoration: AppStyles.coloredCardDecoration(color),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, color: color),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppStyles.spaceSmall),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(AppStyles.radiusSmall),
+                ),
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 20,
+                ),
+              ),
+            ],
+          ),
+
           const Spacer(),
+
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black54,
+            style: AppStyles.caption.copyWith(
+              fontWeight: FontWeight.w500,
             ),
           ),
-          const SizedBox(height: 4),
+
+          const SizedBox(height: AppStyles.spaceXSmall),
+
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+            style: AppStyles.heading3.copyWith(
+              color: color,
             ),
           ),
         ],

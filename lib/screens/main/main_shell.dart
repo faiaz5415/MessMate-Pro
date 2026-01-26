@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../widgets/bottom_nav.dart';
 import 'dashboard_screen.dart';
 import 'meals_screen.dart';
@@ -17,7 +16,7 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
 
-  final _screens = const [
+  final List<Widget> _screens = const [
     DashboardScreen(),
     MealsScreen(),
     BazarScreen(),
