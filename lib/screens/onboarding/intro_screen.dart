@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
 import '../auth/sign_in_screen.dart';
@@ -14,24 +15,34 @@ class _IntroScreenState extends State<IntroScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<_IntroPage> _pages = const [
-    _IntroPage(
-      icon: Icons.restaurant_menu_outlined,
-      title: 'Manage your mess smartly',
-      subtitle: 'Meals, costs, and members in one place',
-      color: AppColors.primary,
+  final List<IntroPage> _pages = [
+    IntroPage(
+      icon: Icons.restaurant_menu_rounded,
+      color: AppColors.purple,
+      title: 'Smart Meal Tracking',
+      description: 'Track your daily meals effortlessly. Day, night, or half portions - we\'ve got you covered.',
+      gradient: [AppColors.purple, AppColors.purple.withOpacity(0.7)],
     ),
-    _IntroPage(
-      icon: Icons.calendar_today_outlined,
-      title: 'Track meals without confusion',
-      subtitle: 'Day & night meals with guest support',
+    IntroPage(
+      icon: Icons.shopping_bag_rounded,
       color: AppColors.orange,
+      title: 'Bazar Management',
+      description: 'Keep track of all shopping expenses. Split costs fairly among all members.',
+      gradient: [AppColors.orange, AppColors.orange.withOpacity(0.7)],
     ),
-    _IntroPage(
-      icon: Icons.payments_outlined,
-      title: 'Clear costs, no arguments',
-      subtitle: 'Automatic calculation for everyone',
+    IntroPage(
+      icon: Icons.account_balance_wallet_rounded,
       color: AppColors.success,
+      title: 'Balance & Costs',
+      description: 'Know exactly what you owe or receive. Crystal clear financial transparency.',
+      gradient: [AppColors.success, AppColors.success.withOpacity(0.7)],
+    ),
+    IntroPage(
+      icon: Icons.groups_rounded,
+      color: AppColors.blue,
+      title: 'Better Together',
+      description: 'Manage your dining mess with friends. Fair, simple, and hassle-free.',
+      gradient: [AppColors.blue, AppColors.blue.withOpacity(0.7)],
     ),
   ];
 
@@ -41,25 +52,23 @@ class _IntroScreenState extends State<IntroScreen> {
     super.dispose();
   }
 
-  void _onPageChanged(int page) {
+  void _onPageChanged(int index) {
     setState(() {
-      _currentPage = page;
+      _currentPage = index;
     });
   }
 
   void _navigateToSignIn() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => const SignInScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const SignInScreen()),
     );
   }
 
   void _nextPage() {
     if (_currentPage < _pages.length - 1) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 400),
         curve: Curves.easeInOut,
       );
     } else {
@@ -70,18 +79,40 @@ class _IntroScreenState extends State<IntroScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Column(
           children: [
             /// SKIP BUTTON
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.all(AppStyles.spaceMedium),
-                child: TextButton(
-                  onPressed: _navigateToSignIn,
-                  child: const Text('Skip'),
-                ),
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppStyles.spaceLarge,
+                vertical: AppStyles.spaceMedium,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'MessMate',
+                    style: AppStyles.heading3.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  if (_currentPage < _pages.length - 1)
+                    TextButton(
+                      onPressed: _navigateToSignIn,
+                      child: Text(
+                        'SKIP',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textSecondary,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
 
@@ -92,45 +123,70 @@ class _IntroScreenState extends State<IntroScreen> {
                 onPageChanged: _onPageChanged,
                 itemCount: _pages.length,
                 itemBuilder: (context, index) {
-                  return _IntroPageWidget(page: _pages[index]);
+                  return _IntroPageView(page: _pages[index]);
                 },
               ),
             ),
 
-            /// PAGE INDICATOR
+            /// BOTTOM SECTION
             Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: AppStyles.spaceLarge,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _pages.length,
-                      (index) => _PageIndicator(
-                    isActive: index == _currentPage,
+              padding: const EdgeInsets.all(AppStyles.spaceXLarge),
+              child: Column(
+                children: [
+                  /// PAGE INDICATOR
+                  SmoothPageIndicator(
+                    controller: _pageController,
+                    count: _pages.length,
+                    effect: ExpandingDotsEffect(
+                      activeDotColor: _pages[_currentPage].color,
+                      dotColor: AppColors.border,
+                      dotHeight: 8,
+                      dotWidth: 8,
+                      expansionFactor: 4,
+                      spacing: 6,
+                    ),
                   ),
-                ),
-              ),
-            ),
 
-            /// BOTTOM BUTTON
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppStyles.spaceLarge,
-                0,
-                AppStyles.spaceLarge,
-                AppStyles.spaceLarge,
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _nextPage,
-                  child: Text(
-                    _currentPage == _pages.length - 1
-                        ? 'Get Started'
-                        : 'Next',
+                  const SizedBox(height: AppStyles.spaceXLarge),
+
+                  /// NEXT/GET STARTED BUTTON
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: _nextPage,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _pages[_currentPage].color,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _currentPage < _pages.length - 1
+                                ? 'NEXT'
+                                : 'GET STARTED',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(
+                            Icons.arrow_forward_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
@@ -141,102 +197,89 @@ class _IntroScreenState extends State<IntroScreen> {
 }
 
 /// ------------------------------------------------------------
-/// INTRO PAGE DATA MODEL
+/// INTRO PAGE MODEL
 /// ------------------------------------------------------------
-class _IntroPage {
+class IntroPage {
   final IconData icon;
-  final String title;
-  final String subtitle;
   final Color color;
+  final String title;
+  final String description;
+  final List<Color> gradient;
 
-  const _IntroPage({
+  IntroPage({
     required this.icon,
-    required this.title,
-    required this.subtitle,
     required this.color,
+    required this.title,
+    required this.description,
+    required this.gradient,
   });
 }
 
 /// ------------------------------------------------------------
-/// INTRO PAGE WIDGET
+/// INTRO PAGE VIEW
 /// ------------------------------------------------------------
-class _IntroPageWidget extends StatelessWidget {
-  final _IntroPage page;
+class _IntroPageView extends StatelessWidget {
+  final IntroPage page;
 
-  const _IntroPageWidget({
-    required this.page,
-  });
+  const _IntroPageView({required this.page});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppStyles.spaceXLarge,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: AppStyles.spaceXLarge),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          /// ICON
+          /// ANIMATED ICON CONTAINER
           Container(
-            padding: const EdgeInsets.all(AppStyles.spaceXLarge),
+            width: 200,
+            height: 200,
             decoration: BoxDecoration(
-              color: page.color.withOpacity(0.1),
-              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: page.gradient,
+              ),
+              borderRadius: BorderRadius.circular(40),
+              boxShadow: [
+                BoxShadow(
+                  color: page.color.withOpacity(0.3),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                ),
+              ],
             ),
             child: Icon(
               page.icon,
-              size: 80,
-              color: page.color,
+              size: 100,
+              color: Colors.white,
             ),
           ),
 
-          const SizedBox(height: AppStyles.spaceXLarge),
+          const SizedBox(height: 60),
 
           /// TITLE
           Text(
             page.title,
-            style: AppStyles.heading1.copyWith(
-              fontSize: 26,
-            ),
             textAlign: TextAlign.center,
+            style: AppStyles.heading1.copyWith(
+              fontWeight: FontWeight.w900,
+              letterSpacing: -0.5,
+            ),
           ),
 
-          const SizedBox(height: AppStyles.spaceMedium),
+          const SizedBox(height: AppStyles.spaceLarge),
 
-          /// SUBTITLE
+          /// DESCRIPTION
           Text(
-            page.subtitle,
+            page.description,
+            textAlign: TextAlign.center,
             style: AppStyles.bodyLarge.copyWith(
               color: AppColors.textSecondary,
+              height: 1.6,
             ),
-            textAlign: TextAlign.center,
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// ------------------------------------------------------------
-/// PAGE INDICATOR DOT
-/// ------------------------------------------------------------
-class _PageIndicator extends StatelessWidget {
-  final bool isActive;
-
-  const _PageIndicator({
-    required this.isActive,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      width: isActive ? 24 : 8,
-      height: 8,
-      decoration: BoxDecoration(
-        color: isActive ? AppColors.primary : AppColors.border,
-        borderRadius: BorderRadius.circular(4),
       ),
     );
   }

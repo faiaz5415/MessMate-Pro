@@ -1,9 +1,8 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
 import '../../widgets/modern_card.dart';
+import '../../widgets/common_dialogs.dart';
 import '../main/main_shell.dart';
 import 'join_status_screen.dart';
 
@@ -20,257 +19,246 @@ class DiningSelectScreen extends StatefulWidget {
 }
 
 class _DiningSelectScreenState extends State<DiningSelectScreen> {
-  final _diningKeyController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _diningNameController = TextEditingController();
+  final _diningCodeController = TextEditingController();
 
   @override
   void dispose() {
-    _diningKeyController.dispose();
+    _diningNameController.dispose();
+    _diningCodeController.dispose();
     super.dispose();
   }
 
-  String _generateDiningKey() {
-    final rand = Random();
-    return (100000 + rand.nextInt(900000)).toString();
-  }
+  void _handleCreateDining() {
+    if (!_formKey.currentState!.validate()) return;
 
-  void _showCreateDiningDialog(BuildContext context) {
-    final nameController = TextEditingController();
-    final monthController = TextEditingController();
-    final diningKey = _generateDiningKey();
-
-    showDialog(
+    CommonDialogs.showConfirmation(
       context: context,
-      barrierDismissible: false,
-      builder: (_) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-          ),
-          title: Text(
-            'Create Your Dining',
-            style: AppStyles.heading3,
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: AppStyles.inputDecoration(
-                    labelText: 'Dining Name',
-                    hintText: 'e.g. Green House Mess',
-                  ),
-                ),
-
-                const SizedBox(height: AppStyles.spaceMedium),
-
-                TextField(
-                  controller: monthController,
-                  decoration: AppStyles.inputDecoration(
-                    labelText: 'Month',
-                    hintText: 'e.g. January 2026',
-                  ),
-                ),
-
-                const SizedBox(height: AppStyles.spaceLarge),
-
-                ModernCard(
-                  color: AppColors.primary.withOpacity(0.05),
-                  padding: const EdgeInsets.all(AppStyles.spaceMedium),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Dining Key',
-                        style: AppStyles.caption.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: AppStyles.spaceSmall),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              diningKey,
-                              style: AppStyles.heading3.copyWith(
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.copy),
-                            color: AppColors.primary,
-                            onPressed: () {
-                              Clipboard.setData(
-                                ClipboardData(text: diningKey),
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text('Dining key copied!'),
-                                  backgroundColor: AppColors.success,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      AppStyles.radiusMedium,
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppStyles.spaceSmall),
-                      Text(
-                        'Share this key with your mess members',
-                        style: AppStyles.caption.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const MainShell(),
-                  ),
-                      (route) => false,
-                );
-              },
-              child: const Text('Create Dining'),
-            ),
-          ],
+      title: 'Create Dining Mess?',
+      message: 'You will be the manager of "${_diningNameController.text}"',
+      confirmText: 'Create',
+      onConfirm: () {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const MainShell()),
+              (route) => false,
         );
       },
     );
   }
 
-  void _joinDining() {
-    if (_diningKeyController.text.length == 6) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const JoinStatusScreen(),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please enter a valid 6-digit key'),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-          ),
-        ),
-      );
+  void _handleJoinDining() {
+    if (!_formKey.currentState!.validate()) return;
+
+    CommonDialogs.showConfirmation(
+      context: context,
+      title: 'Join Dining Mess?',
+      message: 'Send request to join this mess?',
+      confirmText: 'Join',
+      onConfirm: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const JoinStatusScreen()),
+        );
+      },
+    );
+  }
+
+  String? _validateDiningName(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter dining mess name';
     }
+    if (value.length < 3) {
+      return 'Name must be at least 3 characters';
+    }
+    return null;
+  }
+
+  String? _validateDiningCode(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter dining code';
+    }
+    if (value.length < 6) {
+      return 'Code must be at least 6 characters';
+    }
+    return null;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dining Setup'),
+        title: Text(widget.isManager ? 'Create Dining' : 'Join Dining'),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(AppStyles.spaceLarge),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              /// PROGRESS INDICATOR
-              _StepIndicator(currentStep: 3, totalSteps: 3),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                /// PROGRESS INDICATOR
+                _StepIndicator(currentStep: 3, totalSteps: 3),
 
-              const SizedBox(height: AppStyles.spaceXLarge),
+                const SizedBox(height: AppStyles.spaceXLarge),
 
-              /// ICON
-              Center(
-                child: Container(
-                  padding: const EdgeInsets.all(AppStyles.spaceLarge),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    widget.isManager
-                        ? Icons.add_business_outlined
-                        : Icons.groups_outlined,
-                    size: 48,
-                    color: AppColors.primary,
+                /// ICON
+                Center(
+                  child: Container(
+                    padding: const EdgeInsets.all(AppStyles.spaceLarge),
+                    decoration: BoxDecoration(
+                      color: (widget.isManager
+                          ? AppColors.primary
+                          : AppColors.blue)
+                          .withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      widget.isManager
+                          ? Icons.add_business_outlined
+                          : Icons.login_outlined,
+                      size: 56,
+                      color:
+                      widget.isManager ? AppColors.primary : AppColors.blue,
+                    ),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: AppStyles.spaceLarge),
+                const SizedBox(height: AppStyles.spaceLarge),
 
-              Text(
-                widget.isManager
-                    ? 'Create Your Dining'
-                    : 'Join a Dining',
-                style: AppStyles.heading2,
-                textAlign: TextAlign.center,
-              ),
-
-              const SizedBox(height: AppStyles.spaceSmall),
-
-              Text(
-                widget.isManager
-                    ? 'Set up a new mess for your group'
-                    : 'Enter the 6-digit key shared by your manager',
-                style: AppStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
+                /// TITLE
+                Text(
+                  widget.isManager
+                      ? 'Create Your Dining Mess'
+                      : 'Join Existing Mess',
+                  style: AppStyles.heading2,
+                  textAlign: TextAlign.center,
                 ),
-                textAlign: TextAlign.center,
-              ),
 
-              const SizedBox(height: AppStyles.spaceXLarge),
+                const SizedBox(height: AppStyles.spaceSmall),
 
-              if (widget.isManager)
-                ElevatedButton.icon(
-                  onPressed: () => _showCreateDiningDialog(context),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Create New Dining'),
-                )
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextField(
-                      controller: _diningKeyController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 6,
-                      textAlign: TextAlign.center,
-                      style: AppStyles.heading2,
-                      decoration: AppStyles.inputDecoration(
-                        labelText: 'Dining Key',
-                        hintText: '000000',
-                        prefixIcon: const Icon(Icons.vpn_key_outlined),
+                Text(
+                  widget.isManager
+                      ? 'Set up your mess and invite members'
+                      : 'Enter the code provided by your manager',
+                  style: AppStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+
+                const SizedBox(height: AppStyles.spaceXXLarge),
+
+                if (widget.isManager) ...[
+                  /// DINING NAME INPUT (MANAGER)
+                  TextFormField(
+                    controller: _diningNameController,
+                    validator: _validateDiningName,
+                    decoration: AppStyles.inputDecoration(
+                      labelText: 'Dining Mess Name',
+                      hintText: 'e.g., Sunrise Mess',
+                      prefixIcon: const Icon(Icons.restaurant_outlined),
+                    ),
+                  ),
+
+                  const SizedBox(height: AppStyles.spaceMedium),
+
+                  /// INFO CARD
+                  ModernCard(
+                    color: AppColors.info.withOpacity(0.05),
+                    padding: const EdgeInsets.all(AppStyles.spaceMedium),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: AppColors.info,
+                          size: 20,
+                        ),
+                        const SizedBox(width: AppStyles.spaceMedium),
+                        Expanded(
+                          child: Text(
+                            'You can add members later from settings',
+                            style: AppStyles.bodySmall.copyWith(
+                              color: AppColors.info,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  /// DINING CODE INPUT (MEMBER)
+                  TextFormField(
+                    controller: _diningCodeController,
+                    validator: _validateDiningCode,
+                    decoration: AppStyles.inputDecoration(
+                      labelText: 'Dining Code',
+                      hintText: 'Enter 6-digit code',
+                      prefixIcon: const Icon(Icons.qr_code_outlined),
+                    ),
+                  ),
+
+                  const SizedBox(height: AppStyles.spaceMedium),
+
+                  /// INFO CARD
+                  ModernCard(
+                    color: AppColors.warning.withOpacity(0.05),
+                    padding: const EdgeInsets.all(AppStyles.spaceMedium),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.warning_amber_outlined,
+                          color: AppColors.warning,
+                          size: 20,
+                        ),
+                        const SizedBox(width: AppStyles.spaceMedium),
+                        Expanded(
+                          child: Text(
+                            'Your request will need manager approval',
+                            style: AppStyles.bodySmall.copyWith(
+                              color: AppColors.warning,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+
+                const SizedBox(height: AppStyles.spaceXLarge),
+
+                /// ACTION BUTTON
+                SizedBox(
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: widget.isManager
+                        ? _handleCreateDining
+                        : _handleJoinDining,
+                    icon: Icon(
+                      widget.isManager ? Icons.add_rounded : Icons.send_rounded,
+                    ),
+                    label: Text(
+                      widget.isManager ? 'Create Dining' : 'Send Request',
+                    ),
+                    style: AppStyles.primaryButton.copyWith(
+                      backgroundColor: MaterialStateProperty.all(
+                        widget.isManager ? AppColors.primary : AppColors.blue,
+                      ),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                     ),
-
-                    const SizedBox(height: AppStyles.spaceLarge),
-
-                    ElevatedButton(
-                      onPressed: _joinDining,
-                      child: const Text('Request to Join'),
-                    ),
-                  ],
+                  ),
                 ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

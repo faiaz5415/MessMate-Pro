@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
+import 'sign_up_screen.dart';
+import 'forgot_password_screen.dart';
+import '../onboarding/role_selection_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -13,6 +16,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -21,37 +25,72 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
+  Future<void> _handleSignIn() async {
+    setState(() => _isLoading = true);
+
+    // Simulate API call
+    await Future.delayed(const Duration(seconds: 1));
+
+    setState(() => _isLoading = false);
+
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const RoleSelectionScreen(),
+        ),
+            (route) => false,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(AppStyles.spaceLarge),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const SizedBox(height: AppStyles.spaceXLarge),
+              const SizedBox(height: AppStyles.spaceXXLarge),
 
-              /// LOGO & TITLE
+              /// LOGO/ICON
               Center(
                 child: Container(
-                  padding: const EdgeInsets.all(AppStyles.spaceMedium),
+                  padding: const EdgeInsets.all(AppStyles.spaceXLarge),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primary,
+                        AppColors.primary.withOpacity(0.8),
+                      ],
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
                   ),
-                  child: Icon(
-                    Icons.restaurant_menu,
-                    size: 48,
-                    color: AppColors.primary,
+                  child: const Icon(
+                    Icons.restaurant_menu_rounded,
+                    size: 56,
+                    color: Colors.white,
                   ),
                 ),
               ),
 
-              const SizedBox(height: AppStyles.spaceLarge),
+              const SizedBox(height: AppStyles.spaceXLarge),
 
+              /// TITLE
               Text(
-                'Welcome Back',
+                'Welcome Back!',
                 style: AppStyles.heading1,
                 textAlign: TextAlign.center,
               ),
@@ -59,14 +98,14 @@ class _SignInScreenState extends State<SignInScreen> {
               const SizedBox(height: AppStyles.spaceSmall),
 
               Text(
-                'Sign in to continue',
+                'Sign in to continue to MessMate Pro',
                 style: AppStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: AppStyles.spaceXLarge),
+              const SizedBox(height: AppStyles.spaceXXLarge),
 
               /// EMAIL FIELD
               TextField(
@@ -92,8 +131,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   suffixIcon: IconButton(
                     icon: Icon(
                       _obscurePassword
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
+                          ? Icons.visibility_outlined
+                          : Icons.visibility_off_outlined,
                     ),
                     onPressed: () {
                       setState(() {
@@ -111,43 +150,73 @@ class _SignInScreenState extends State<SignInScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/forgot-password');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ForgotPasswordScreen(),
+                      ),
+                    );
                   },
-                  child: const Text('Forgot Password?'),
+                  child: Text(
+                    'Forgot Password?',
+                    style: AppStyles.bodySmall.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
 
-              const SizedBox(height: AppStyles.spaceMedium),
+              const SizedBox(height: AppStyles.spaceLarge),
 
               /// SIGN IN BUTTON
-              ElevatedButton(
-                onPressed: () {
-                  // Mock navigation
-                  Navigator.pushReplacementNamed(context, '/profile-setup');
-                },
-                child: const Text('Sign In'),
+              SizedBox(
+                height: 56,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _handleSignIn,
+                  child: _isLoading
+                      ? const SizedBox(
+                    height: 24,
+                    width: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white,
+                      ),
+                    ),
+                  )
+                      : const Text('Sign In'),
+                ),
               ),
 
-              const SizedBox(height: AppStyles.spaceLarge),
+              const SizedBox(height: AppStyles.spaceXLarge),
 
               /// SIGN UP LINK
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Don\'t have an account? ',
+                    'Don\'t have an account?',
                     style: AppStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/sign-up');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SignUpScreen(),
+                        ),
+                      );
                     },
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
+                    child: Text(
+                      'Sign Up',
+                      style: AppStyles.bodyMedium.copyWith(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                    child: const Text('Sign Up'),
                   ),
                 ],
               ),

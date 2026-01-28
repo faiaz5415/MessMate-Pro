@@ -1,20 +1,40 @@
 import 'package:flutter/material.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
-import '../../widgets/modern_card.dart';
 import 'dining_select_screen.dart';
 
-class RoleSelectionScreen extends StatelessWidget {
+class RoleSelectionScreen extends StatefulWidget {
   const RoleSelectionScreen({super.key});
+
+  @override
+  State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
+}
+
+class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
+  int? _selectedRole;
+
+  void _handleContinue() {
+    if (_selectedRole == null) return;
+
+    final bool isManager = _selectedRole == 0;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DiningSelectScreen(isManager: isManager),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Choose Your Role'),
+        title: const Text('Select Your Role'),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.all(AppStyles.spaceLarge),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -22,61 +42,77 @@ class RoleSelectionScreen extends StatelessWidget {
               /// PROGRESS INDICATOR
               _StepIndicator(currentStep: 2, totalSteps: 3),
 
-              const Spacer(),
+              const SizedBox(height: AppStyles.spaceXLarge),
 
               /// TITLE
               Text(
-                'How Will You Use\nMessMate Pro?',
-                style: AppStyles.heading2,
+                'What\'s Your Role?',
+                style: AppStyles.heading1.copyWith(fontSize: 28),
                 textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: AppStyles.spaceSmall),
+              const SizedBox(height: AppStyles.spaceMedium),
 
               Text(
-                'Select your role to continue',
+                'Choose whether you\'re managing a mess or joining one',
                 style: AppStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
 
-              const SizedBox(height: AppStyles.spaceXLarge),
+              const SizedBox(height: AppStyles.spaceXXLarge),
 
-              /// ROLE CARDS
+              /// MANAGER OPTION
               _RoleCard(
-                title: 'Manager',
-                description: 'Create and manage a dining mess',
                 icon: Icons.admin_panel_settings_outlined,
+                title: 'I\'m a Manager',
+                description: 'Create and manage your dining mess',
                 color: AppColors.primary,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const DiningSelectScreen(isManager: true),
-                    ),
-                  );
-                },
+                isSelected: _selectedRole == 0,
+                onTap: () => setState(() => _selectedRole = 0),
               ),
 
               const SizedBox(height: AppStyles.spaceMedium),
 
+              /// MEMBER OPTION
               _RoleCard(
-                title: 'Member',
+                icon: Icons.person_outline,
+                title: 'I\'m a Member',
                 description: 'Join an existing dining mess',
-                icon: Icons.person_add_outlined,
                 color: AppColors.blue,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const DiningSelectScreen(isManager: false),
-                    ),
-                  );
-                },
+                isSelected: _selectedRole == 1,
+                onTap: () => setState(() => _selectedRole = 1),
               ),
 
-              const Spacer(),
+              const SizedBox(height: AppStyles.spaceXXLarge),
+
+              /// CONTINUE BUTTON
+              SizedBox(
+                height: 56,
+                child: ElevatedButton.icon(
+                  onPressed: _selectedRole != null ? _handleContinue : null,
+                  icon: const Icon(Icons.arrow_forward_rounded),
+                  label: const Text('Continue'),
+                  style: AppStyles.primaryButton.copyWith(
+                    backgroundColor: MaterialStateProperty.resolveWith(
+                          (states) {
+                        if (states.contains(MaterialState.disabled)) {
+                          return AppColors.border;
+                        }
+                        return _selectedRole == 0
+                            ? AppColors.primary
+                            : AppColors.blue;
+                      },
+                    ),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -85,69 +121,114 @@ class RoleSelectionScreen extends StatelessWidget {
   }
 }
 
-/// ROLE CARD WIDGET
+/// ROLE SELECTION CARD
 class _RoleCard extends StatelessWidget {
+  final IconData icon;
   final String title;
   final String description;
-  final IconData icon;
   final Color color;
+  final bool isSelected;
   final VoidCallback onTap;
 
   const _RoleCard({
+    required this.icon,
     required this.title,
     required this.description,
-    required this.icon,
     required this.color,
+    required this.isSelected,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ModernCard(
+    return GestureDetector(
       onTap: onTap,
-      padding: const EdgeInsets.all(AppStyles.spaceLarge),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(AppStyles.spaceMedium),
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
-            ),
-            child: Icon(
-              icon,
-              size: 32,
-              color: color,
-            ),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(AppStyles.spaceLarge),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.08) : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppStyles.radiusLarge),
+          border: Border.all(
+            color: isSelected ? color : AppColors.border,
+            width: isSelected ? 2 : 1,
           ),
+          boxShadow: isSelected
+              ? [
+            BoxShadow(
+              color: color.withOpacity(0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ]
+              : AppStyles.cardShadow,
+        ),
+        child: Row(
+          children: [
+            /// ICON
+            Container(
+              padding: const EdgeInsets.all(AppStyles.spaceMedium),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                size: 32,
+                color: color,
+              ),
+            ),
 
-          const SizedBox(width: AppStyles.spaceMedium),
+            const SizedBox(width: AppStyles.spaceMedium),
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppStyles.heading3,
-                ),
-                const SizedBox(height: AppStyles.spaceXSmall),
-                Text(
-                  description,
-                  style: AppStyles.bodySmall.copyWith(
-                    color: AppColors.textSecondary,
+            /// TEXT
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppStyles.heading3.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: isSelected ? color : AppColors.textPrimary,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: AppStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          Icon(
-            Icons.arrow_forward_ios,
-            size: 16,
-            color: AppColors.textSecondary,
-          ),
-        ],
+            const SizedBox(width: AppStyles.spaceSmall),
+
+            /// CHECK ICON
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: isSelected ? color : Colors.transparent,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: isSelected ? color : AppColors.border,
+                  width: 2,
+                ),
+              ),
+              child: isSelected
+                  ? const Icon(
+                Icons.check_rounded,
+                size: 16,
+                color: Colors.white,
+              )
+                  : null,
+            ),
+          ],
+        ),
       ),
     );
   }

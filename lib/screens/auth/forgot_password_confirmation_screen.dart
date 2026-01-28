@@ -47,16 +47,63 @@ class ForgotPasswordConfirmationScreen extends StatelessWidget {
               const SizedBox(height: AppStyles.spaceMedium),
 
               Text(
-                'We\'ve sent a password reset link to your email. Please check your inbox and follow the instructions.',
+                'We\'ve sent a password reset link to your email address.\nPlease check your inbox and follow the instructions.',
                 style: AppStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                 ),
                 textAlign: TextAlign.center,
               ),
 
+              const SizedBox(height: AppStyles.spaceXLarge),
+
+              /// INFO CARD
+              Container(
+                padding: const EdgeInsets.all(AppStyles.spaceMedium),
+                decoration: BoxDecoration(
+                  color: AppColors.info.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(AppStyles.radiusMedium),
+                  border: Border.all(
+                    color: AppColors.info.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      color: AppColors.info,
+                      size: 20,
+                    ),
+                    const SizedBox(width: AppStyles.spaceMedium),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Didn\'t receive the email?',
+                            style: AppStyles.bodySmall.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.info,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Check your spam folder or wait a few minutes',
+                            style: AppStyles.caption.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               const Spacer(),
 
-              /// BACK TO SIGN IN
+              /// BACK TO LOGIN BUTTON
               ElevatedButton(
                 onPressed: () {
                   Navigator.pushAndRemoveUntil(
@@ -71,6 +118,30 @@ class ForgotPasswordConfirmationScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: AppStyles.spaceMedium),
+
+              /// RESEND BUTTON
+              OutlinedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Reset link sent again!'),
+                      backgroundColor: AppColors.success,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppStyles.radiusMedium,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Resend Email'),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.border),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
             ],
           ),
         ),
