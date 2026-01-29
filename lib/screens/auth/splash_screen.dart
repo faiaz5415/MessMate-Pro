@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
 import '../onboarding/intro_screen.dart';
+import 'sign_in_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -51,12 +53,36 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Start animation and navigate
     _controller.forward();
-    _navigateToIntro();
+    _navigateToNext();
   }
 
-  void _navigateToIntro() async {
+  /// Check if user has seen intro and navigate accordingly
+  void _navigateToNext() async {
     await Future.delayed(const Duration(seconds: 3));
-    if (mounted) {
+
+    if (!mounted) return;
+
+    // Read persistent storage flag
+    final prefs = await SharedPreferences.getInstance();
+    final hasSeenIntro = prefs.getBool('hasSeenIntro') ?? false;
+
+    if (!mounted) return;
+
+    if (hasSeenIntro) {
+      // Existing user: Skip intro, go to SignIn
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) =>
+          const SignInScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: child);
+          },
+          transitionDuration: const Duration(milliseconds: 500),
+        ),
+      );
+    } else {
+      // New user: Show intro
       Navigator.pushReplacement(
         context,
         PageRouteBuilder(
@@ -137,7 +163,7 @@ class _SplashScreenState extends State<SplashScreen>
 
                         /// APP NAME
                         Text(
-                          'MessMate',
+                          'MessMate Pro',
                           style: AppStyles.heading1.copyWith(
                             fontWeight: FontWeight.w900,
                             fontSize: 42,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
 import '../auth/sign_in_screen.dart';
@@ -58,7 +59,12 @@ class _IntroScreenState extends State<IntroScreen> {
     });
   }
 
-  void _navigateToSignIn() {
+  Future<void> _navigateToSignIn() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('hasSeenIntro', true);
+
+    if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const SignInScreen()),
@@ -83,7 +89,6 @@ class _IntroScreenState extends State<IntroScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            /// SKIP BUTTON
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppStyles.spaceLarge,
@@ -93,7 +98,7 @@ class _IntroScreenState extends State<IntroScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'MessMate',
+                    'MessMate Pro',
                     style: AppStyles.heading3.copyWith(
                       fontWeight: FontWeight.w800,
                       color: AppColors.primary,
@@ -115,8 +120,6 @@ class _IntroScreenState extends State<IntroScreen> {
                 ],
               ),
             ),
-
-            /// PAGE VIEW
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -127,13 +130,10 @@ class _IntroScreenState extends State<IntroScreen> {
                 },
               ),
             ),
-
-            /// BOTTOM SECTION
             Padding(
               padding: const EdgeInsets.all(AppStyles.spaceXLarge),
               child: Column(
                 children: [
-                  /// PAGE INDICATOR
                   SmoothPageIndicator(
                     controller: _pageController,
                     count: _pages.length,
@@ -146,10 +146,7 @@ class _IntroScreenState extends State<IntroScreen> {
                       spacing: 6,
                     ),
                   ),
-
                   const SizedBox(height: AppStyles.spaceXLarge),
-
-                  /// NEXT/GET STARTED BUTTON
                   SizedBox(
                     width: double.infinity,
                     height: 56,
@@ -196,9 +193,6 @@ class _IntroScreenState extends State<IntroScreen> {
   }
 }
 
-/// ------------------------------------------------------------
-/// INTRO PAGE MODEL
-/// ------------------------------------------------------------
 class IntroPage {
   final IconData icon;
   final Color color;
@@ -215,9 +209,6 @@ class IntroPage {
   });
 }
 
-/// ------------------------------------------------------------
-/// INTRO PAGE VIEW
-/// ------------------------------------------------------------
 class _IntroPageView extends StatelessWidget {
   final IntroPage page;
 
@@ -230,7 +221,6 @@ class _IntroPageView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          /// ANIMATED ICON CONTAINER
           Container(
             width: 200,
             height: 200,
@@ -255,10 +245,7 @@ class _IntroPageView extends StatelessWidget {
               color: Colors.white,
             ),
           ),
-
           const SizedBox(height: 60),
-
-          /// TITLE
           Text(
             page.title,
             textAlign: TextAlign.center,
@@ -267,10 +254,7 @@ class _IntroPageView extends StatelessWidget {
               letterSpacing: -0.5,
             ),
           ),
-
           const SizedBox(height: AppStyles.spaceLarge),
-
-          /// DESCRIPTION
           Text(
             page.description,
             textAlign: TextAlign.center,
