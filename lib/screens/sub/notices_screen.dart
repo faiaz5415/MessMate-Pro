@@ -128,7 +128,7 @@ class _NoticesScreenState extends State<NoticesScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              AppColors.blue.withOpacity(0.03),
+              AppColors.primary.withOpacity(0.03),
               AppColors.background,
             ],
             stops: const [0.0, 0.3],
@@ -240,7 +240,7 @@ class _NoticesScreenState extends State<NoticesScreen> {
         onPressed: () {},
         icon: const Icon(Icons.add_rounded),
         label: const Text('Post Notice'),
-        backgroundColor: AppColors.blue,
+        backgroundColor: AppColors.primaryLight,
       ),
     );
   }
@@ -283,17 +283,17 @@ class _FilterChips extends StatelessWidget {
               onSelected: (_) => onFilterChanged(filter),
               backgroundColor: AppColors.surface,
               selectedColor: AppColors.blue.withOpacity(0.15),
-              checkmarkColor: AppColors.blue,
+              checkmarkColor: AppColors.primaryLight,
               labelStyle: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? AppColors.blue : AppColors.textSecondary,
+                color: isSelected ? AppColors.primaryLight : AppColors.textSecondary,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
                 side: BorderSide(
                   color: isSelected
-                      ? AppColors.blue.withOpacity(0.3)
+                      ? AppColors.primaryLight.withOpacity(0.3)
                       : AppColors.border,
                   width: 1,
                 ),

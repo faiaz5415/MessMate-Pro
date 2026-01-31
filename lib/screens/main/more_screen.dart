@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:mess_mate_pro/screens/sub/about_screen.dart';
+import 'package:mess_mate_pro/screens/sub/feedback_screen.dart';
+import 'package:mess_mate_pro/screens/sub/help_center_screen.dart';
+import 'package:mess_mate_pro/screens/sub/settings_screen.dart';
 import '../../utils/app_colors.dart';
 import '../../utils/app_styles.dart';
 import '../../widgets/modern_card.dart';
+import '../sub/profile_screen.dart';
+import '../sub/settings_screen.dart';
 import '../sub/members_screen.dart';
 import '../sub/notices_screen.dart';
+import '../sub/meal_table_screen.dart'; // ✅ ADDED
 import '../auth/sign_in_screen.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -139,12 +146,21 @@ class MoreScreen extends StatelessWidget {
                   },
                 ),
 
+                /// ✅ FIXED MEAL TABLE TILE
                 _MenuTile(
                   icon: Icons.table_chart_outlined,
                   title: 'Meal Table',
-                  subtitle: 'Daily meal tracking',
+                  subtitle: 'Weekly meal plan',
                   color: AppColors.purple,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                        const MealTableScreen(isManager: false),
+                      ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: AppStyles.spaceLarge),
@@ -158,7 +174,15 @@ class MoreScreen extends StatelessWidget {
                   title: 'Profile',
                   subtitle: 'Manage your profile',
                   color: AppColors.teal,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ProfileScreen(),
+                      ),
+                    );
+                  },
+
                 ),
 
                 _MenuTile(
@@ -166,7 +190,14 @@ class MoreScreen extends StatelessWidget {
                   title: 'Settings',
                   subtitle: 'App preferences',
                   color: AppColors.blue,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const SettingsScreen(),
+                      ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: AppStyles.spaceLarge),
@@ -180,7 +211,14 @@ class MoreScreen extends StatelessWidget {
                   title: 'Help Center',
                   subtitle: 'FAQs and support',
                   color: AppColors.info,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const HelpCenterScreen(),
+                      ),
+                    );
+                  },
                 ),
 
                 _MenuTile(
@@ -188,7 +226,14 @@ class MoreScreen extends StatelessWidget {
                   title: 'Send Feedback',
                   subtitle: 'Share your thoughts',
                   color: AppColors.warning,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const FeedbackScreen(),
+                      ),
+                    );
+                  },
                 ),
 
                 _MenuTile(
@@ -196,12 +241,19 @@ class MoreScreen extends StatelessWidget {
                   title: 'About',
                   subtitle: 'App version & info',
                   color: AppColors.textSecondary,
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AboutScreen(),
+                      ),
+                    );
+                  },
                 ),
 
                 const SizedBox(height: AppStyles.spaceLarge),
 
-                /// LOGOUT BUTTON (ONLY LOGIC ADDED)
+                /// LOGOUT BUTTON
                 Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppStyles.spaceLarge,
